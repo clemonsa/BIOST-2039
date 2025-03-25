@@ -1,0 +1,221 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 10"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: November 15, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(11152019) # Do not change this!
+library(dplyr)
+library(ggplot2)
+library(car)
+```
+
+# Problem 1 (10 points)
+Prepare a concept map of all the statistical tests/procedures we have covered in class so far, including any necessary requirements for each test. Organize it however you wish. You may upload a separate document for this question if you would like (e.g. picture of a handwritten concept map).
+
+# Problem 2 (10 points)
+Diffuse intrinsic pontine glioma is a rare, rapidly fatal brainstem glioma that typically occurs in children ages 5 to 10. Palliative whole brain radiation is typically the only treatment available due to tumor entanglement with healthy tissue controlling breathing. Enterprising investigators at Homeopathic Treatments R Us are interested in testing the effect of a class of compounds called anti-neoplastons on primary tumor shrinkage in a cohort of 17 recently diagnosed patients. Tumor size in millimeters was measured before and after treatment via contrast-enhanced MRI. The results of this study are shown in the dataset dipg.csv.
+
+```{r}
+dipg <- read.csv("dipg.csv", as=T)
+```
+
+Conduct both a parametric and a nonparametric statistical analysis to answer the researchers question using a 0.05 significance level. Be sure to include the following:
+
+- Appropriate numerical and visual descriptive statistics  
+- A description of the hypothesis testing procedures used (the null and alternative hypotheses, checking conditions, reporting and interpreting the test statistic and p-value, reporting the statistical decision and conclusion in context of the research question, as appropriate)  
+- An interpretation of an appropriate and informative confidence interval in the context of the research question (as appropriate)  
+- Comment on which analysis would be more appropriate to use. Justify your claim fully.  
+
+
+```{r}
+#Numerical and Visual Descriptive Statistics
+dipg[1:5,]
+summary(dipg)
+ggplot(data=dipg, aes(x=before)) +
+geom_histogram(aes(y=..count..), colour = 'black', fill='royalblue4', bins = 30) + ggtitle('Before Treatment') + xlab('Primary Tumor Size: Measured in millimeters')
+ggplot(data=dipg, aes(x=after)) +
+geom_histogram(aes(y=..count..), colour = 'black', fill='palegreen4', bins = 30) + ggtitle('After Treatment') + xlab('Primary Tumor Size: Measured in millimeters')
+```
+
+This data set consists of a simple random sample for pairs (n=17) of dependent observations, which are symmetric about their their means. 
+
+Beyond the sample size (n=<30) and presence of outliers, this data fits the conditions for a paired t hypothesis test. The paired t hypothesis test is used ideally for dependent observations with a sample size of at greater than 30, symmetrically distributed, unimodal and with no outliers.
+
+We will use a significance level of 0.05.
+
+Null Hypothesis:
+The true population mean difference of the measurements for Primary Tumor size is equal to 0 between before and after treatment with anti-neoplastons.
+
+Alternative Hypothesis:
+The true population mean difference of measurements for Primary Tumor size is NOT equal to 0 between before and after treatment with anti-neoplastons.
+
+```{r}
+#paired t-test
+t<- t.test(x=dipg$before, y=dipg$after, paired = TRUE)
+t
+
+#Critical Value/Rejection Region
+cv1<- qt(p=0.05, df=16, lower.tail = FALSE)
+cv1
+```
+
+The Test Statistic `r t$statistic` under the Null Hypothesis is within a t-distribution with 16 degrees of freedom and is LESSER THAN OR EQUAL to the Critical Value/Rejection Region `r cv1`. The p-value is `r t$p.value` which indicates the probability of obtaining the observed mean difference as or more extreme than `r t$estimate`, assuming the null hypothesis is true.
+
+Thus we conclude that that we little or no evidence to reject the Null Hypothesis and as such we FAIL TO REJECT the Null Hypothesis. As such we cannot conclude that anti-neoplastons are effective in reducing tumor size.
+
+We are 95% confident that the true population mean difference in primary tumor size before and after treatment is between `r t$conf.int`.
+
+An appropriate non-parametric test to use would be the Wilcoxon Signed-Rank Test. This test is best used for matched pairs of data and tests claims regarding the median of the population. The conditions for this test are that the data is a simple random sample and the differences are symmetrically distributed, both conditions are met with this data.
+
+We will use a significance level of 0.05.
+
+Null Hypothesis:
+The true population median difference of the measurements for Primary Tumor size is equal to 0 between before and after treatment with anti-neoplastons.
+
+Alternative Hypothesis:
+The true population median difference of the measurements for Primary Tumor size is NOT equal to 0 between before and after treatment with anti-neoplastons.
+
+```{r}
+#Wilcoxon Signed-Rank Test
+w <- wilcox.test(dipg$before, dipg$after, paired = TRUE, exact = FALSE, correct = FALSE, conf.int = TRUE)
+w
+
+#Critical Value/Rejection Region
+cv2 <- qwilcox(p=0.05, m=17, n=17, lower.tail = FALSE)
+cv2
+```
+
+The Test Statistic `r w$statistic` under the Null Hypothesis is within a normal distribution and is LESSER THAN OR EQUAL to the Critical Value/Rejection Region `r cv2`. The p-value is `r w$p.value` which indicates the probability of obtaining the observed median difference as or more extreme than `r w$estimate`, assuming the null hypothesis is true.
+
+Thus we conclude that we have weak,but suggestive evidence to reject the Null Hypothesis and as such we FAIL TO REJECT the Null Hypothesis. As such we cannot conclude that anti-neoplastons are effective in reducing tumor size.
+
+We are 95% confident that the true population median difference in primary tumor size before and after treatment is between `r w$conf.int`.
+
+
+Of the two analysis performed above, the Wilcox Signed-Rank Test was the most appropriate, this is because sample size was less than 30 and outliers were present, which fails some of the conditions for the paired t-test. However this sample met all of the requirements for the Wilcox Signed-Rank Test.
+
+# Problem 3 (10 points)
+
+Polyunsaturated fatty acids in the diet favorably affect several risk factors for cardiovascular disease. The principal dietary polyunsaturated fat is linoleic acid. To test the effects of dietary supplements on linoleic acid on blood pressure, 20 adults consumed 23 g/day of safflower oil, high in linoleic acid for 4 weeks; and 20 adults did not receive supplementation. Systolic blood pressure (SBP) measurements were taken after 1 month. The results are contained in safflower.csv.
+
+```{r}
+safflower <- read.csv("safflower.csv", as=T)
+```
+
+Research question: is there a difference in blood pressure based for patients taking safflower oil? 
+
+Conduct both a parametric and a nonparametric statistical analysis to answer the researchers question using a 0.05 significance level. Be sure to include the following:
+
+- Appropriate numerical and visual descriptive statistics  
+- A description of the hypothesis testing procedures used (the null and alternative hypotheses, checking conditions, reporting and interpreting the test statistic and p-value, reporting the statistical decision and conclusion in context of the research question, as appropriate)  
+- An interpretation of an appropriate and informative confidence interval in the context of the research question (as appropriate)  
+- Comment on which analysis would be more appropriate to use. Justify your claim fully. 
+
+```{r}
+#Numerical and Visual Descriptive Statistics
+str(safflower)
+summary(safflower)
+
+ggplot(data=safflower, aes(x=group, y=sbp, fill=group)) + geom_boxplot() +
+  ylab('Systolic Blood Pressure') + xlab('Treatment Group') + scale_y_continuous()
+
+ggplot(data=safflower, aes(x=sbp)) +
+geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 20) + 
+geom_density(alpha = 0.5, fill='royalblue4') + facet_wrap(~factor(group))
+```
+
+This data consists of a simple random sample of two independent groups with continous observations and a sample size of 40. The sample sizes between the two treatment groups are even (n=20), with heterogeniety in median and shape between the two. The control group has one outlier and neither population is symmetrically distributed.
+
+As such, we've decided that the two hypothesis tests that will be used to analyze the sample will be the 2 sample t-test and Wilcoxon Rank Sum Test.
+
+The 2 sample t-test compares the difference of means between two independent groups and has the conditions: (i) that the sample be a simple random, (ii) the distribution be symmetric, (iii) the sample size be at greater than 30, and (iv) sample has no outliers.
+
+The Wilcoxon Rank Sum Test compares the medians of two independent samples through ranks to see if they are equal. Its only conditions: (i) the samples be random and independent and (ii) populations have the same shape.
+
+For both tests we will use a significance level of 0.05
+
+First I will test if the population variance of systolic blood pressure (SBP) is equal between the two treatment groups, in order to perform the appropriate 2 sample T test using the Modified Levenes test for Homogeneity of Variance.
+
+Modified Levenes Test
+
+Null Hypothesis: The true population variance SBPs are equal between treatment groups.
+
+Alternative Hypothesis: The true population variance SBPs are NOT equal between treatment groups.
+
+```{r}
+#Modified Levenes Test
+l <- leveneTest(sbp~factor(group), data=safflower, center=median)
+l
+```
+Assuming the Null Hypothesis to be true, the probability of obtaining a difference in SBP variances between the two treatment groups as or more extreme than observed is equal to the p-value, which is `r l$Pr`.
+
+Hence we have little to no evidence to reject the Null Hypothesis and thus we FAIL TO REJECT the Null Hypothesis. Thus we cannot assume that the true population variance SBPs are NOT equal between treatment groups.
+
+2 sample T test
+
+Null Hypothesis:
+The true population difference in means in systolic blood pressure (SBP) between treatment groups are equal to 0.
+
+Alternative Hypothesis:
+The true population difference in means in systolic blood pressure (SBP) between treatment groups are NOT equal to 0.
+
+```{r}
+#2 sample T test
+t2<- t.test(safflower$sbp~safflower$group, var.equal=TRUE)
+t2
+
+#Critical Value/Rejection Region
+cv3<- qt(p=0.05, df=38, lower.tail = FALSE)
+cv3
+```
+The Test Statistic `r t2$statistic` under the Null Hypothesis is within a t distribution with 38 degrees of freedom and is GREATER THAN the Critical Value/Rejection Region `r cv3`. The p-value is `r t2$p.value` which indicates the probability of obtaining the observed difference in means as or more extreme than `r (117.8-110.3)`, assuming the null hypothesis is true.
+
+Thus we conclude that we have moderate evidence to reject the Null Hypothesis and as such we REJECT the Null Hypothesis. We conclude that there is a difference in systolic blood pressure for patients using safflower oil compared to those who did not.
+
+We are 95% confident that the true population difference in means for systolic blood pressure (SBP) between treatment groups are `r t2$conf.int`.
+
+Wilcoxon Rank Sum Test
+
+Null Hypothesis:
+The true population median in systolic blood pressure (SBP) in the Safflower Treatment Group is equal to the true population median in systolic blood pressure in the Control Group.
+
+Alternative Hypothesis:
+The true population median in systolic blood pressure (SBP) in the Safflower Treatment Group is NOT equal to the true population median in systolic blood pressure in the Control Group.
+
+```{r}
+#Wilcoxon Rank Sum Test
+w2 <- wilcox.test(safflower$sbp~safflower$group, correct=FALSE, conf.int = TRUE)
+w2
+
+#Critical Value/Rejection Region
+cv4 <- qwilcox(p=0.05, m=20, n=20, lower.tail = FALSE)
+cv4
+```
+The Test Statistic `r w2$statistic` under the Null Hypothesis is within a normal distribution and is GREATER THAN the Critical Value/Rejection Region `r cv4`. The p-value is `r w2$p.value` which indicates the probability of obtaining the observed difference in median as or more extreme than `r w2$estimate`, assuming the null hypothesis is true.
+
+The exact p-value cannot be computed however because of the ties in the ranking.
+
+Thus we conclude that we have weak,but suggestive evidence to reject the Null Hypothesis and as such we FAIL TO REJECT the Null Hypothesis. We conclude that we need more evidence to reject the Null Hypothesis.
+
+We are 95% confident that the true population difference in means for systolic blood pressure (SBP) between treatment groups are `r w2$conf.int`.
+
+Of the two analyses performed for the research question, the Wilcoxon Rank Sum Test was the most appropriate. The 2 sample t-test conditions of the sample being symmetric and with no outliers was not met. However, the Wilcoxon Rank Sum Test conditions for  the populations to be of the same shape was also violated.
+# Session Info
+```{r}
+sessionInfo()
+```

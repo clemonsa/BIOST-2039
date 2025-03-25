@@ -1,0 +1,285 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 7"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: October 18, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(10182019) # Do not change this!
+library(tibble)
+library(ggplot2)
+```
+
+# Problem 1
+One study of grand juries in Alameda County, California, compared the demographic characteristics of jurors with the general population, to see if jury panels were representative. The results for age are shown below. The investigators wanted to know if the 66 jurors were selected at random from the population of Alameda County. (Only persons over 21 and over are considered; the county age distribution is known from Public Health Department data.) The study was published in the UCLA Law Review (vol 20, 1973).  
+
+| Age (years)	| County-wide %	| # jurors observed |  
+|-------------|---------------|-------------------|  
+|  21-40      |     42%       |      5            |  
+|  41-50      |     23%       |      9            |  
+|  51-60      |     16%       |      19           |  
+|  over 60    |     19%       |      33           |  
+
+## Part A (8 points)
+Do you think there is evidence that the grand jury selection does not follow the county-wide age distribution? What type of test should be used to test this question? Conduct this test in R, using a **1% significance level**. Be sure to include the following: state the hypotheses, check the conditions, state the value of the test statistic and give its distribution under the null hypothesis, state the p-value and write a one-sentence interpretation of it in the context of the problem, state your decision, and write a conclusion in the context of the problem.
+
+Null Hypothesis: The 66 selected jurors in Alameda County were selected at random.
+
+Alternative Hypothesis: The 66 selected jurors in Alameda County were NOT selected at random.
+
+This study is to determine whether the distribution of selected juries is representative of the population. This question is best answered using a "Goodness-of-fit" test.
+```{r}
+#Create tibble of data from above with expected juror counts
+obs1 <- tribble(~'Age(yrs)',~'County-wide%',~'#jurors.obs','21-40',42,5,'41-50',23,9,'51-60',16,19,'over 60',19,33)
+jurors.exp <- c(66*.42, 66*.23, 66*.16,66*.19)
+obs1 <- add_column(.data = obs1, jurors.exp)
+
+#Observed Probabilities and Expected Probabilities
+prop.obs <- prop.table(obs1$`#jurors.obs`)
+prop.exp <- prop.table(obs1$jurors.exp)
+
+#Test Statistic
+q1 <- sum((obs1$`#jurors.obs` - obs1$jurors.exp)^2/obs1$jurors.exp)
+
+#Critical Value/Rejection Region with 1% significance level
+cv1 <- qchisq(df=3, p=0.01, lower.tail = FALSE)
+
+#P-value
+pval1 <- pchisq(q=q1, df=3, lower.tail = FALSE)
+
+#Test if Test Statistic is Greater than the Critical Value/Rejection Region
+q1 > cv1
+```
+#Statement of Test Statistic and its distribution under the null hypothesis.
+The Test Statistic `r q1` is GREATER than the Critical Value/Rejection Region `r cv1`.
+
+#Statement of the p-value and a one-sentence interpretation of it in context of the problem.
+The p-value is `r pval1` which indicates strong evidence against the hypothesis that the 66 selected jurors of Alameda county were selected randomly.
+
+#Statement of decision and conclusion in context of the problem
+As a result of the above results, I decided to REJECT the Null Hypothesis and conclude that the 66 selected jurors of Alameda county were NOT selected at random.
+
+
+## Part B (7 points)
+Assume that the null hypothesis you defined in Part A is true for the population. Create a simulation (using 10000 iterations) in which you draw random samples of size 66 from the population. For each of these simulated samples, calculate the value of the test statistic and store it. Create a visualization of the resulting test statistics. Use it to estimate the probability of observing a test statistic as or more extreme than the one you observed in Part A. 
+
+```{r}
+#Create matrix storing 1000 jurors at county-wide proportion
+sim <- matrix(ncol = 4, nrow = 1000)
+colnames(sim)<-c('21-40','41-50','51-60','over 60')
+sim[1:(prop.exp[1]*1000),1] <- 1
+sim[(prop.exp[1]*1000+1):(prop.exp[2]*1000+420),2] <- 1
+sim[(prop.exp[2]*1000+421):(prop.exp[3]*1000+650),3] <- 1
+sim[(prop.exp[3]*1000+651):(prop.exp[4]*1000+810),4] <- 1
+
+nboot <- 10000 # number of bootstrap samples
+
+# create a data frame to store juror categorical totals in
+boot.total <- data.frame(sim.num=1:nboot, '21-40'=rep(NA,nboot),'41-50'=rep(NA,nboot),'51-60'=rep(NA,nboot),'over 60'=rep(NA,nboot))
+
+# Simulate drawing random samples of 66 jurors from population at 10000 iterations
+for (i in 1:nboot) {
+  boot <- sim[sample(x=nrow(sim), size=66, replace=TRUE),] #obtain the bootstrap sample
+  for (j in 2:5){
+  boot.total[i,j] <- sum(boot[,j-1],na.rm=TRUE)
+  }
+}
+
+# Create a data frame to store Test Statistic from each simulation
+boot.test <- data.frame(sim.num=1:nboot, Q=rep(NA,nboot))
+
+# Calculate Test Statistic from each simulation
+boot.test[, 2] <- apply(boot.total[, 2:5], 1, function(x){sum((x - jurors.exp)^2/jurors.exp)})
+
+#Create visualization of Test Statistics from each simulation
+ggplot(data=boot.test, aes(x=Q)) +
+geom_histogram(aes(fill=as.factor(Q >= q1 )),bins=50, colour = 'black')
+```
+
+Based on the histogram above, the probability of getting a Test Statistics equal or greater than `r q1` is EXTREMELY small as the visualization does not even display a Q greater than 20.
+
+# Problem 2 (12 points)
+In a kidney study, 400 patients were randomized to continuous renal replacement therapy (CRRT) and 300 were randomized to intermittent hemodialysis (IHD). It was found that at baseline 220 subjects in the CRRT treatment group were septic, while at baseline 126 of the subjects in the IHD group were septic.
+
+Perform an appropriate test to see if the proportion of sepsis is the same across treatment group, using a **5% significance level**. (Hint: there are 2 possible correct choices.) Be sure to include the following: state the hypotheses, check the conditions, state the value of the test statistic and give its distribution under the null hypothesis, state the p-value and write a one-sentence interpretation of it in the context of the problem, state your decision, and write a conclusion in the context of the problem.
+
+```{r}
+cat('One of the appropriate tests for this problem is the Homogeneity Test.')
+cat('Null Hypothesis: The true proportion of subjects who were septic is homogenous across the CRRT and IHD groups.')
+cat('Alternative Hypothesis: The true proportion of subjects who were septic is NOT homogenous across the CRRT and IHD groups.')
+
+#Create matrix of subjects who were septic/non-septic based on treatment groups
+sub.obs <- matrix(nrow=3,ncol=3)
+row.names(sub.obs)<- c('CRRT','IHD','Total')
+colnames(sub.obs)<- c('Non-Septic','Septic','Total')
+sub.obs[1,1] <- 400-220
+sub.obs[1,2] <- 220
+sub.obs[1,3] <- 400
+sub.obs[2,1] <- 300-126
+sub.obs[2,2] <- 126
+sub.obs[2,3] <- 300
+sub.obs[2,1] <- 300-126
+sub.obs[2,2] <- 126
+sub.obs[2,3] <- 300
+sub.obs[3,1] <- (400-220) + (300-126)
+sub.obs[3,2] <- 220 + 126
+sub.obs[3,3] <- 400 + 300
+
+print(sub.obs)
+
+#Create matrix of expected counts of subjects
+sub.exp <- matrix(nrow=2, ncol=2)
+colnames(sub.exp) <- c('Non-Septic','Septic')
+rownames(sub.exp) <-c('CRRT','IHD')
+for (j in 1:2){
+   m <- sub.obs[3, j]
+   
+  for (i in 1:2){
+    
+ n <- (sub.obs[i, 3]*m)/sub.obs[3,3]
+ sub.exp[i,j] <- n
+ }
+}
+
+print(sub.exp)
+
+# Calculate Test Statistic (Q)
+q2 <- sum((sub.obs[-3,-3] - sub.exp)^2 / sub.exp)
+
+# Calculate the Critical Value/Rejection Region with 5% significance level
+cv2 <- qchisq(df=(nrow(sub.exp)-1)*(ncol(sub.exp)-1), p=0.05, lower.tail = FALSE)
+
+# Calculate the p-value with 5% significance level
+pval2 <- pchisq(q=q2, df=(nrow(sub.exp)-1)*(ncol(sub.exp)-1), lower.tail = FALSE)
+
+#Test if Test Statistic is Greater than the Critical Value/Rejection Region
+q2 > cv2
+```
+
+#Statement of Test Statistic and its distribution under the null hypothesis.
+The Test Statistic `r q2` is GREATER than the Critical Value/Rejection Region `r cv2`
+
+#Statement of the p-value and a one-sentence interpretation of it in context of the problem.
+The p-value is `r pval2` which indicates strong evidence against the hypothesis that the true proportion of subjects who were septic is homogenous across the CRRT and IHD groups.
+
+#Statement of decision and conclusion in context of the problem
+As a result of the above results, I decided to REJECT the Null Hypothesis and conclude that the true proportion of subjects who were septic is NOT homogenous across the CRRT and IHD groups.
+
+Consider the other appropriate hypothesis testing method to see if the proportion of sepsis is the same across treatment group (the one you didn't just perform). How would you expect the results to differ, if at all? 
+
+The other appropriate hypothesis testing method would be the Independence Testing method. The calculations are the same for either method, however the Null and Alternative Hypothesis would differ to the following.
+
+Null Hypothesis: Whether a subject became septic or not is independent of the method of treatment (CRRT and IHD) .
+
+Alternative Hypothesis: Whether a subject became septic or not is NOT independent of the method of treatment (CRRT and IHD).
+
+We would still reject the Null Hypothesis and conclude that there is a connection between developing sepsis and the treatment method used on the subject, in other words there is some sort of disparity between the groups.
+
+Calculate the odds ratio of sepsis for the CRRT group compared to the IHD group and the corresponding 95% confidence interval for the odds ratio. Write a one-sentence interpretation of this in the context of the problem. 
+
+```{r}
+# Calculation of the Odds Ratio
+OR <- (sub.obs[1,1]*sub.obs[2,2])/(sub.obs[2,1]*sub.obs[1,2])
+
+```
+
+The odds of getting being non-septic for the IHD treatment group is `r 1/OR` times higher than for the CRRT treatment group.
+
+```{r}
+# Calculation of the 95% confidence interval for the Odds Ratio
+se <- sqrt((1/sub.obs[1,1])+(1/sub.obs[2,1])+(1/sub.obs[1,2])+(1/sub.obs[2,2]))
+lower <- log(OR) - 1.96*se
+upper <- log(OR) + 1.96*se
+```
+
+We are 95% confident that the outcome level for the CRRT treatment group is between `r ((1-exp(lower))*100)` % lower and `r ((1-exp(upper))*100)`% lower than the IHD treatement group for become septic.
+
+# Problem 3 (8 points)
+A randomized controlled trial was designed to test the effectiveness of hip protectors in preventing hip fractures in the elderly. Nursing home residents each wore a protector on one hip, but not the other. In this study, 336 of the nursing home residents experienced a fall. The results of the study are given in the table below.
+
+```{r}
+results <- matrix(c(309, 15, 10, 2), nrow = 2,
+                  dimnames = list("Hip with protector" = c("Hip not fractured", "Hip fractured"),
+                                  "Hip without protector" = c("Hip not fractured", "Hip fractured")))
+results
+```
+Perform a valid hypothesis test to see if the proportion of hip fractures with the protectors worn is significantly different from the proportion of hip fractures without the hip protectors worn, using a **5% significance level**. Be sure to include the following: state the hypotheses, check the conditions, state the value of the test statistic and give its distribution under the null hypothesis, state the p-value and write a one-sentence interpretation of it in the context of the problem, state your decision, and write a conclusion in the context of the problem.
+
+I will perform a McNemars Test.
+
+Null Hypothesis: The true proportion of hip fractures on study participants wearing a hip protector is equal to the true proportion of hip fractures on study participants not wearing a hip protector.
+
+Alternative Hypothesis: The true proportion of hip fractures on study participants wearing a hip protector is NOT equal to the true proportion of hip fractures on study participants not wearing a hip protector.
+
+```{r}
+#McNemars Test
+mcnemar.test(results, correct = FALSE)
+
+#McNemar Test Statistic
+q4 <- ((results[1,2]-results[2,1])^2)/(results[1,2]+results[2,1])
+
+#Critical Value/Rejection Region
+cval4 <- qchisq(df=1, p=0.05, lower.tail = FALSE)
+
+#Calculate the p-value with 5% significance level
+pval4 <- pchisq(q=q4, df=1, lower.tail = FALSE)
+
+#Test if Test Statistic is Greater than the Critical Value/Rejection Region
+q4 > cval4
+```
+
+#Statement of Test Statistic and its distribution under the null hypothesis.
+The Test Statistic `r q4` is LESSER than the Critical Value/Rejection Region `r cval4`
+
+#Statement of the p-value and a one-sentence interpretation of it in context of the problem.
+The p-value is `rpval4` which indicates little evidence against the hypothesis that the true proportion of hip fractures on study participants wearing a hip protector is EQUAL to the true proportion of hip fractures on study participants not wearing a hip protector.
+
+#Statement of decision and conclusion in context of the problem
+As a result of the above, we FAIL TO REJECT the Null Hypothesis and I conclude that the true proportion of hip fractures between those who wore a hip protector and those who did not ARE equal.
+
+
+# Problem 4 (8 points)
+The MythBusters show on Discovery Channel test the theory that when someone yawns, others are more likely to yawn. Of the 34 subjects who were exposed to yawning, 10 of them yawned. Of the 16 subjects who were not exposed to yawning, 4 of them yawned. Does it appear that when someone yawns, others are more likely to yawn, based on this experiment? Use a valid hypothesis testing procedure to support your decision.
+
+
+I will use the Fishers Exact Test to determine weather people are more likely to yawn when someone else yawns.
+
+#Null Hypothesis/Alternative Hypothesis
+Null Hypothesis: The true proportion of those who yawn and were exposed to others yawning is equal to those who were not exposed.
+
+Alternative Hypothesis: The true proportion of those who yawn and were exposed to others yawning is NOT equal to those who were not exposed.
+
+```{r}
+#Matrix of Observations
+yawn.obs <- matrix(data=c(10,4,24,12),nrow = 2,ncol = 2)
+colnames(yawn.obs) <- c('yes', 'no')
+rownames(yawn.obs) <- c('Exposed','Unexposed')
+print(yawn.obs)
+
+#Fisher Exact Test
+
+f <- fisher.test(x=yawn.obs)
+f
+```
+
+The p-value for this experiment is 1, suggesting there is absolutely no evidence to reject the Null Hypothesis.
+
+As a result of the above, I reject the Null Hypothesis and conclude that the true proportion of those who yawn and were exposed to others yawning is equal to those who were not exposed.
+
+# Session Info
+```{r}
+sessionInfo()
+```

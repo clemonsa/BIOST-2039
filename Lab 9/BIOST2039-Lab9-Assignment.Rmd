@@ -1,0 +1,168 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 9"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: November 6, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(11062019) # Do not change this!
+library(dplyr)
+library(SASxport)
+library(ggplot2)
+library(car)
+```
+
+# Problem 1: NHANES
+
+## Part A (7 POINTS)
+
+Create an analysis-ready data set from the NHANES 2015-2016 data that contains (1) Respondent sequence number, (2) Systolic: Blood pressure (first reading) mm Hg, (3) Gender of the participant, and (4) Age in years of the participant at the time of screening. Restrict this data set to only include adults 18 years and older with no missing values.
+
+```{r}
+#Merging demographics and blood pressure data sets by
+#respondent sequence number
+
+demo <- read.xport('DEMO_I.XPT')
+bpx <- read.xport('BPX_I.XPT')
+
+combo <- full_join(bpx, demo, by = 'SEQN')
+
+#print out of Demographics, Blood Pressure, and merged data sets
+str(demo[1:5])
+str(bpx[1:5])
+str(combo[1:5])
+```
+
+```{r}
+#Subset data into including only the SEQN, BPXSY1, RIAGENDR,
+#and RIDAGEYR variables
+
+combo <- combo[,c('SEQN','BPXSY1', 'RIAGENDR','RIDAGEYR')]
+
+#Change Gender variable values to "Male" and "Female"
+combo$RIAGENDR[combo$RIAGENDR == 1] = 'Male'
+combo$RIAGENDR[combo$RIAGENDR == 2] = 'Female'
+
+#Subset data to include only participants => 18yrs old with no missing data
+
+combo.adults <- combo[combo$RIDAGEYR >= 18,] #adults only
+combo.adults <- na.omit(combo.adults) #remove any participants w/ missing data
+```
+
+```{r}
+#Check to confirm that 'combo.adults' dataframe cleaning was successful
+missing <- sum(is.na(combo.adults)) #Number of rows w/ missing values
+summary.data.frame(combo.adults)
+
+females <- sum(combo.adults$RIAGENDR == 'Female') #Number of female participants
+males <- sum(combo.adults$RIAGENDR == 'Male') #Number of male participants
+
+str(combo.adults[1:10,])
+```
+
+There are `r missing` adults with missing values for `r females` females and `r males` males.
+
+## Part B (13 POINTS)
+
+Create an appropriate numerical and visual summary of SBP by gender.
+
+```{r}
+#Numerical summary
+male.sum <- summary(combo.adults$BPXSY1[combo.adults$RIAGENDR == 'Male']) #male summary of SBP
+female.sum <- summary(combo.adults$BPXSY1[combo.adults$RIAGENDR == 'Female']) #female summary of SBP
+
+print(female.sum)
+print(male.sum)
+```
+
+```{r}
+#Visual summary
+ggplot(data=combo.adults, aes(x=RIAGENDR, y=BPXSY1, fill=RIAGENDR)) + geom_boxplot() +
+  ylab('Systolic Blood Pressure: 1st Reading mm Hg') + xlab('Gender') + scale_y_continuous()
+```
+
+Use a 0.05 significance level to test if the mean SBP differs by gender. Make sure to include the following: 
+
+- the null and alternative hypotheses (defining any parameters)
+- check the conditions for using the appropriate hypothesis test
+- the value of the test statistic
+- the distribution of the test statistic under the null hypothesis
+- the p-value and an interpretation of the p-value
+- your decision
+- a conclusion in the context of the problem
+
+
+Null Hypothesis: The true population mean Systolic Blood Pressure (SBP) between genders does NOT differ and thus the difference of means are equal to 0.
+
+Alternative Hypothesis: The true population mean Systolic Blood Pressure (SBP) between genders does differ and thus the difference of means are NOT equal to 0.
+
+
+
+I can assume from Part A that the two populations are independent by gender and I know that the sample size for each population is significantly greater than 30. Also the dependent variable (SBP) is on a continous scale. This fulfills the conditions for a two-sample t test.
+
+However, it remains to be determined if the population variance SBP are equal between genders. This must be evaluated in order to use the appropriate test statistic for the two-sample t test. The box plots from Part A shows that the SBP values for each gender are right-skewed so I will use the Modified Levenes test for Homogeneity of Variance.
+
+
+Modified Levenes Test:
+
+Null Hypothesis: The true population variance SBP are equal between genders.
+
+Alternative Hypothesis: The true population variance SBP are NOT equal between genders.
+
+```{r}
+l <- leveneTest(BPXSY1~factor(RIAGENDR), data=combo.adults, center=median)
+l
+```
+Assuming the Null Hypothesis is true, the probability of observing homogeneity of variance in SBP between the two genders as or more extreme than what we observed are `r l$'Pr(>F)'`. Which I interpret as meaning we have very strong evidence to REJECT THE NULL hypothesis. Thus I conclude that the true population variance SBP are NOT equal between genders.
+
+
+Return to the two sample t-test:
+
+```{r}
+#Two sample t-test
+t <- t.test(combo.adults$BPXSY1~combo.adults$RIAGENDR)
+
+t
+```
+
+The value of the test statistic is `r t$statistic` and the probability of observing the difference of mean SBP between genders being as or more extreme are `r t$p.value`. which I interpret as meaning we have very strong evidence to REJECT THE NULL. Thus I conclude that the true population mean SBP between genders does differ and the difference of means are NOT equal to 0.
+
+Construct and interpret a 95% confidence interval for the hypothesis test above.
+```{r}
+female.mu <- mean(combo.adults$BPXSY1[combo.adults$RIAGENDR == 'Female']) #female sample SBP mean
+male.mu <- mean(combo.adults$BPXSY1[combo.adults$RIAGENDR == 'Male']) #male sample SBP mean
+female.sd <- sd(combo.adults$BPXSY1[combo.adults$RIAGENDR == 'Female']) #female sample SBP standard deviation
+male.sd <- sd(combo.adults$BPXSY1[combo.adults$RIAGENDR == 'Male']) #male sample SBP standard deviation
+
+tstat <- (female.mu - male.mu)/sqrt((female.sd^2/females)+(male.sd^2/males)) #Test Statistic
+
+upper <- (female.mu - male.mu) - (tstat*(sqrt((female.sd/females)+(male.sd/males)))) #Upper CI
+lower <-(female.mu - male.mu) + (tstat*(sqrt((female.sd/females)+(male.sd/males)))) #Lower CI
+```
+
+```{r}
+#Print calculated values
+print(c(female.mu,male.mu,female.sd,male.sd)) #mean and standard deviations for females and males respectively
+print(tstat) #Test Statistic
+print(c(upper,lower)) #upper and lower CIs
+```
+
+We are 95% confident that the true population mean SBP of females is between `r lower` and `r upper` less than the true mean of males.
+
+# Session Info
+```{r}
+sessionInfo()
+```

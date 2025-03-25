@@ -1,0 +1,310 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 6"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: October 9, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(10092019) # Do not change this!
+library(ggplot2)
+library(tidyverse)
+library(pwr)
+```
+
+# Problem 1 (10 points)
+Use the data set from the Inpatient Prospective Payment System (IPPS) Provider Summary (obtained from data.cms.gov). These data include average charges for the top 100 most frequently billed discharges by hospital for over 3,000 hospitals in the U.S. More information is available at: https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2011.html. You will need to download this data set from Canvas and put it in the same location as this RMD file on your computer or change the path to point to the data set.  
+
+```{r}
+ipps <- read.csv("Inpatient_Prospective_Payment_System__IPPS__Provider_Summary_for_the_Top_100_Diagnosis-Related_Groups__DRG__-_FY2011.csv", header=TRUE, as.is = TRUE)
+head(ipps)
+```
+
+For this question, consider the variable `Average.Total.Payments` which represents the average of Medicare payments  (in \$) to the provider for the diagnosis related group (DRG), including co-payment and deductible amounts that the patient is responsible for.  
+
+Find the mean and standard deviation of `Average.Total.Payments`. 
+
+```{r}
+meanATP<-mean(ipps$Average.Total.Payments)
+sdATP <- sd(ipps$Average.Total.Payments)
+```
+
+Generate a histogram and normal quantile plot (qq plot) of `Average.Total.Payments`. Does it appear that the average payments come from a population with a normal distribution? Explain. 
+
+```{r}
+ggplot(data=ipps, aes(x=Average.Total.Payments)) +
+geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 75) + 
+geom_density(alpha = 0.5, fill='royalblue4')
+#Create histogram from dataframe 'ipps' of the values in column 'Average.Total.Payments'
+
+qqnorm(ipps$Average.Total.Payments, ylab = 'X~N(0,1)')
+qqline(ipps$Average.Total.Payments)
+
+#Create qq plot from dataframe 'ipps' of the values in column 'Average.Total.Payments'
+
+cat('Based on the above graphs, it does not appear that the average payments come from a population with a normal distribution. This is because on the histogram we can see a large right skew, which should not exist for a normal curve as they are supposed to appear symmetrical. Furthermore the normal qq plot also shows a large deviation in the data from the normal line.')
+```
+
+Are the requirements to use the t distribution to create a confidence interval for the population mean total payments satisfied? Explain. 
+
+```{r}
+cat('No, part of the requirements for a t distribution is that it must be unimodal, symmetric, and with no outliers. This data set is cleary very asymmetrical. Despite that the N > 30, this departure from being normally distributed in combination with its lack of symmetry makes a t-test very inappropriate.')
+```
+
+Regardless of your answer, find a 95% confidence interval for the population mean. Write an interpretation of this confidence interval.
+
+```{r}
+ipps_df <- length(ipps$Average.Total.Payments) - 1
+ipps_n <- length(ipps$Average.Total.Payments)
+ipps_CI <-c(meanATP - qt(p=0.025, df= ipps_df, lower.tail = FALSE)*sdATP/sqrt(ipps_n), meanATP + qt(p=0.025, df= ipps_df, lower.tail = FALSE)*sdATP/sqrt(ipps_n)) 
+#95% Confidence interval for ipps$Average.Total.Payment
+
+cat('We are 95% confident that the true population mean is between',ipps_CI,'.')
+
+```
+
+Are the requirements to use the $\chi^2$ distribution to create a confidence interval for the population variance in total payments satisfied? Explain.
+
+```{r}
+cat('No, they are not. A very important requirement for the Chi squared distribution is that the population must have normally distributed values and large departures from this can cause significant errors. As seen from the histogram and qqplot, this population is very asymmetrical and is NOT normally distributed.')
+```
+
+Regardless of your answer, find a 95% confidence interval for the population variance. Write an interpretation of this confidence interval. 
+
+```{r}
+ipps_chiCI <- c(
+((ipps_df)*(sdATP)^2)/qchisq(p=.025,df=ipps_df),
+((ipps_df)*(sdATP)^2)/qchisq(p=.025,df=ipps_df,lower.tail = FALSE))
+
+#Lower and Upper Chi squared CIs for ipps$Average.Total.Payments
+
+cat('We are 95% confident that the true population variance is between',ipps_chiCI,'.')
+
+```
+
+Find 95% confidence intervals for the population mean and variance using 1,000 bootstrap samples. To do this, create a loop to perform the 1,000 bootstrap iterations. For each iteration, take a bootstrap sample (with replacement) of the `Average.Total.Payments`. Store the mean and variance of your bootstrapped sample in two vectors.
+
+```{r}
+nboot <- 1000 # number of bootstrap samples
+
+bootmu <- data.frame(sim.num=1:nboot, means=rep(NA, nboot))
+bootvar <- data.frame(sim.num=1:nboot, vars=rep(NA,nboot))
+# create a data frame to store results in
+cl <- parallel::makePSOCKcluster(parallel::detectCores())
+doParallel::registerDoParallel(cl)
+
+for (i in 1:nboot) {
+  bootmu.sample <- ipps[sample(x=1:ipps_n, size=ipps_n, replace=TRUE), ] #obtain the bootstrap sample
+  bootmu$means[i] <- mean(bootmu.sample$Average.Total.Payments) # record the bootstrap sample mean
+}
+
+for (i in 1:nboot) {
+  bootvar.sample <- ipps[sample(x=1:ipps_n, size=ipps_n, replace=TRUE), ] #obtain the bootstrap sample
+  bootvar$vars[i] <- var(bootvar.sample$Average.Total.Payments) # record the bootstrap sample mean
+}
+doParallel::stopImplicitCluster()
+```
+
+Once you've completed the 1,000 bootstrap iterations, plot the vector of means and the vector of variances.
+```{r}
+ggplot(data=bootmu, aes(x=means)) +
+geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 75) + 
+geom_density(alpha = 0.5, fill='royalblue4')
+#Create histogram from dataframe 'bootmu' of the values in column 'means'
+
+qqnorm(bootmu$means, ylab = 'X~N(0,1)')
+qqline(bootmu$means)
+
+#Create qq plot from dataframe 'bootmu' of the values in column 'means'
+
+ggplot(data=bootvar, aes(x=vars)) +
+geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 25) + 
+geom_density(alpha = 0.5, fill='palegreen4')
+#Create histogram from dataframe 'bootvar' of the values in column 'vars'
+
+qqnorm(bootvar$vars, ylab = 'X~N(0,1)')
+qqline(bootvar$vars)
+
+#Create qq plot from dataframe 'bootvar' of the values in column 'vars'
+``` 
+From these vectors, estimate the 2.5th percentile and 97.5th percentile of each to construct the lower and upper bounds of the CIs.
+```{r}
+meanATP2 <- mean(bootmu$means)
+sdATP2 <- sd(bootmu$means)
+
+ipps_CI2 <-c(meanATP2 - qt(p=0.025, df= nboot-1, lower.tail = FALSE)*(sdATP2/sqrt(nboot)), meanATP2 + qt(p=0.025, df= nboot-1, lower.tail = FALSE)*(sdATP2/sqrt(nboot)))
+#95% Confidence interval for bootmu$means
+
+cat('We are 95% confident that the true population mean is between',ipps_CI2,'.')
+
+ipps_chiCI2 <- c(
+((nboot-1)*(sdATP2)^2)/qchisq(p=.025,df=nboot-1, lower.tail = FALSE),
+((nboot-1)*(sdATP2)^2)/qchisq(p=.025,df=nboot-1,lower.tail = TRUE))
+#Lower and Upper Chi squared CIs for bootmu$means
+
+cat('We are 95% confident that the true population variance is between',ipps_chiCI2,'.')
+```
+
+How do these CIs compare to the ones you calculated above? 
+
+```{r}
+cat('The mean CIs from my bootstrap samples are very similar with an absolute difference of',abs(ipps_CI - ipps_CI2),'.')
+
+cat('The variance CIs from my bootstrap samples differed by a great amount, with an absolute differene of ',abs(ipps_chiCI - ipps_chiCI2),'.')
+```
+(Note: this will take a few minutes to run because the sample size is so large.)
+
+# Problem 2 (10 points)
+Researchers are interested in studying whether the average CD4 cell counts of HIV-infected patients prior to treatment is lower than 200. To do so they studied a sample of 34 HIV-positive patients. Assume the researchers set the significance level at 5%. Use the cd4 dataset from Canvas to answer the following questions.
+
+```{r}
+load("cd4.RData")
+```
+
+Create a visualization of the CD4 cell counts. Describe the distribution (shape, center, spread, unusual observations).
+
+```{r}
+ggplot(data=cd4.df, aes(x=cd4)) +
+geom_histogram(aes(y=..count..), colour = 'black', fill='grey', bins = 25)
+#geom_density(alpha = 0.5, fill='royalblue4')
+#Create histogram from dataframe 'cd4.df' of the values in column 'cd4'
+
+cat('The distribution appears to be bimodal, with a median around the 200 cell count number. There is a very large range of cells counts from around 100 to 300. There is a notable lack of cells counts around 125.')
+```
+
+State the null and alternative hypotheses. Is this a one-sided or two-sided test?
+
+```{r}
+cat('Null Hypothesis: The true average of CD4 cell counts of HIV-infected patients prior to treatment are at least 200.
+
+Alternative Hypothesis: The true average of CD4 cell counts of HIV-infected patients prior to treatment are lesser than 200.')
+
+cat('This would be a one-sided test, as it is an issue of whether the average CD4 cell count lower than 200 or not.')
+```
+
+Perform the appropriate test in R. Are the conditions for using this test met? Explain.
+
+```{r}
+cat('I will be performing a t-test, which meets most of the conditions as this distribution has a n > 30, is symmetric, with no particular outliers. However, the data appears to be bimodal and the t-test is recommended for a population that is unimodal.')
+
+meanCD4 <- mean(cd4.df$cd4)
+sdCD4 <- sd(cd4.df$cd4)
+
+cd4_n <- length(cd4.df$cd4)
+cd4_df <- cd4_n - 1
+
+cd4.tstat <- (meanCD4 - 200)/(sdCD4/sqrt(cd4_n))
+
+cd4.sig <- qt(p=0.025, df=cd4_df, lower.tail = FALSE)
+
+t.test(x=cd4.df$cd4, mu=200, conf.level = 0.95, alternative = 'less')
+```
+
+
+What is the value of the test statistic? What is the distribution of the test statistic under the null hypothesis?
+
+```{r}
+cat('The value of the test statistic is -0.58896. The distribution of the test statistic under the null hypothesis is less than the rejection zone',cd4.sig,'.')
+```
+
+What is the p-value? Write a one-sentence interpretation of this p-value in the context of the problem (Hint: The p-value is the probability of ...what?). Does this lead you to reject or fail to reject the null hypothesis?
+
+```{r}
+cat('The p-value is 0.28. This is much greater than the 0.05 the researchers deemed necessary for significance. Thus we fail to reject the null hypothesis.')
+```
+
+State the conclusion of the study in the context of the problem.
+
+```{r}
+cat('In conclusion, there is insufficient evidence that the average CD4 cell count of an HIV-infected patient prior to treatment is less than 200.')
+```
+
+What is the 95% confidence interval? Interpret it in the context of the problem. Does this confidence interval agree with the hypothesis testing results? Explain.
+
+```{r}
+cat('The confidence interval is -inf to 208.95. We are 95% confident that the true population variance is between -inf and 208.95. This interval does agree with the hypothesis testing results as the interval goes over the 200 average CD4 cell count.')
+```
+
+# Problem 3 (10 points)
+The proportion of deaths due to lung cancer in males ages 15-64 in England and Wales during the period 1970-1972 was 12%. Suppose that of the 20 total deaths that occur among male workers in this age group who have worked for at least 1 year in a chemical plant, 5 are due to lung cancer. Are there significantly more deaths from lung cancer in this plant than in the general population? Conduct a hypothesis test to answer this question using a 0.05 significance level.
+
+
+
+State the null and alternative hypotheses. Is this a one-sided or two-sided test?
+```{r}
+cat('Null Hypothesis: The true proportion of deaths from lung cancer in male plant workers ages 15-64 who worked for at least 1 year is no larger than the 12% in the general population of England and Wales between 1970 - 1972.
+
+Alternative Hypothessis: The true proportion of deaths from lung cancer in male plant workers ages 15-64 who worked for at least 1 year is larger than the 12% in the general population of England and Wales beween 1970 - 1972.')
+
+cat('This would be a one-sided test.')
+```
+Perform the appropriate test in R. Are the conditions for using this test met? Explain.
+
+```{r}
+cat('I will perform a t-test on this question. The conditions for using this test are not fully satisfied, as the sample population is not at least 30.')
+
+popdeaths <- c(rep(0,88),rep(1,12))
+plantdeaths <- c(rep(0,15),rep(1,5))
+
+t.test(x=plantdeaths, mu=0.12, conf.level = 0.95, alternative = 'greater')
+```
+What is the value of the test statistic? What is the distribution of the test statistic under the null hypothesis?
+
+```{r}
+cat('The value of the test statistic is 1.3086. The distribution is less then the rejection region of the null hypothesis',qt(p=0.05, df=19, lower.tail=FALSE),'.')
+```
+
+What is the p-value? Write a one-sentence interpretation of this p-value in the context of the problem (Hint: The p-value is the probability of ...what?). Does this lead you to reject or fail to reject the null hypothesis?
+
+```{r}
+cat('The p-value is 0.1031. We are 10% certain that there is not enough evidence to reject the null hypothesis and thus we fail to reject the null.')
+```
+
+State the conclusion of the study in the context of the problem.
+
+```{r}
+cat('In conclusion, the true proportion of deaths from lung cancer in male plant workers ages 15-64 who worked for at least 1 year is no larger than the 12% in the general population of England and Wales between 1970 - 1972.')
+```
+
+What is the 95% confidence interval? Interpret it in the context of the problem. Does this confidence interval agree with the hypothesis testing results? Explain.
+
+```{r}
+cat('The 95% confidence interval is 0.07822807        Inf and agrees with the hypothesis testing results. For it includes a large proportion of the area uncer the curve outside of 0.05')
+```
+
+# Problem 4 (10 points)
+Consider the example from class, in which a study is designed to examine the efficacy of music therapy in pain reduction. The researchers want to perform a hypothesis test for the proportion of chronic pain patients who experience a reduction in pain after listening to music. Calculate the power of this hypothesis test for all possible combinations of the given effect sizes and sample sizes. Generate a power curve to display these results. The power curve should have power on the y-axis and sample size on the x-axis. There should be one curve generated for each possible effect size. 
+
+Possible effect sizes: 0.05, 0.10, 0.20  
+
+Possible sample sizes: 50-1000 in increments of 50
+
+```{r}
+effect <- c(0.05, 0.10, 0.20)
+n <- seq(50, 1000, 50)
+#vector of effect sizes and vector of sample sizes.
+pwr <- data.frame(effect =rep(effect, times=20), size= rep(n, each=3), pwr = rep(NA,60))
+#data frame to store 'pwr' values
+#for (i in 1:20) {
+#   pwr$pwr[i] <- pwr.p.test(h=effect, n=n[i], sig.level = 0.05, power = NULL)  
+#}
+
+pwr.p.test(h=rep(effect,times=20),n=rep(n, each=3), sig.level =0.05, power=NULL)
+```
+
+# Session Info
+```{r}
+sessionInfo()
+```

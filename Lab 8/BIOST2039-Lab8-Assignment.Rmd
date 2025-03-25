@@ -1,0 +1,184 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 8"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: October 30, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(10302019) # Do not change this!
+library(dplyr)
+library(ggplot2)
+
+```
+
+# Problem 1: Tobacco and Alcohol in Disney Movies
+
+Use the data set "Movies.txt" which contains the times in seconds that animated Disney movies showed the use of tobacco and the times that they showed the use of alcohol.  
+
+```{r}
+Movies <- read.delim("./Movies.txt")
+```
+
+## Part A (10 points)
+
+Create an appropriate numerical and visual summary of the variables of interest. 
+
+```{r}
+#Histograms of Alcohol and Tobacco seconds in Disney movies
+ggplot(data=Movies[Movies$STUDIO == 'Disney',], aes(x=TOBACCO_SEC)) +
+geom_histogram(aes(y=..count..), colour = 'black', fill='royalblue4', bins = 50)
+
+ggplot(data=Movies[Movies$STUDIO == 'Disney',], aes(x=ALCOHOL_SEC)) +
+geom_histogram(aes(y=..count..), colour = 'black', fill='palegreen4', bins = 50)
+```
+
+Use a 0.05 significance level to test the claim the movies tended to have different times showing tobacco use than alcohol use (i.e., mean difference in time showing tobacco and alcohol is different from 0). Make sure to include the following: 
+
+- the null and alternative hypotheses (defining any parameters)
+- check the conditions for using the appropriate hypothesis test
+- the value of the test statistic
+- the distribution of the test statistic under the null hypothesis
+- the p-value and an interpretation of the p-value
+- your decision
+- a conclusion in the context of the problem
+
+```{r}
+cat('Null Hypothesis: The mean difference of seconds showing tobacco use versus alcohol use is 0.')
+
+cat('Alternative Hypothesis: The mean difference of seconds showing tobacco use versus alcohol use is NOT 0.')
+
+cat('The total number of seconds of alcohol use and tobacco use in each Disney film are dependent variables and n > 30. This fulfills the conditions for using a paired t-test in testing the hypothesis.')
+
+#Test Statistic variables and calculation
+d <- mean(Movies[Movies$STUDIO == 'Disney', "TOBACCO_SEC" ] - Movies[Movies$STUDIO == 'Disney', "ALCOHOL_SEC"])
+s <- sd(Movies[Movies$STUDIO == 'Disney', "TOBACCO_SEC" ] - Movies[Movies$STUDIO == 'Disney', "ALCOHOL_SEC"])
+n <- length(Movies[Movies$STUDIO == 'Disney', "TOBACCO_SEC" ] - Movies[Movies$STUDIO == 'Disney', "ALCOHOL_SEC"])
+
+t.stat <- d / (s/sqrt(n))
+
+cat("The Test Statistic",t.stat,' underneath the Null hypothesis is within the t distribution.')
+
+#Paired t-test
+t <- t.test(x= Movies[Movies$STUDIO == 'Disney', "TOBACCO_SEC"], y= Movies[Movies$STUDIO == 'Disney', "ALCOHOL_SEC"], paired = TRUE)
+
+t
+
+cat('The p-value is',t$p.value,' which suggests we have very little to no evidence to reject the Null.')
+
+cat('Thus, I decided that we FAIL TO REJECT the Null Hypothesis and conclude that Disney movies DO NOT have different times showing alcohol use than tobacco use.')
+
+```
+
+Construct and interpret a 95% confidence interval for the hypothesis test above.
+
+```{r}
+# Creation of 95% confidence interval
+
+cv <- qt(p=0.025, df=32, lower.tail=FALSE) #Critical Value
+
+upper <- d + cv*(s/sqrt(n))
+lower <- d - cv*(s/sqrt(n))
+
+cat('I am 95% confident that the true mean difference of TOBACCO_SEC and ALCOHOL_SEC is between',lower,'and',upper,'seconds.')
+
+```
+
+## Part B (10 points)
+
+In this section, we will examine what we might expect to happen if there were truly no difference between the times in seconds that animated Disney movies showed the use of tobacco and the times that they showed the use of alcohol through something called a randomization test. 
+
+The idea behind this randomization test is this: if there is no difference in the tobacco times and alcohol times within each movie, then it wouldn't matter which time is labeled as the tobacco time and which is labeled as the alcohol time. Thus, we assume that the absolute value of the difference between tobacco time and alcohol time will be the same for each movie, but the sign (+/-) of the difference will be random. 
+
+We will create a simulation of plausible values for our test statistic by assuming that the tobacco and alcohol labels are random. To do this, 
+
+1. Create a new data frame that contains shuffled values of the tobacco and alcohol times *within* each movie (i.e. row of the data frame). Print this new data frame and confirm that within each row the magnitude of the differences has stayed the same as the original data. You may use the `shuffle_pairs` function from the Lab 8 Notes. 
+
+```{r}
+#Create 'shuffle_pairs' function
+shuffle_pairs <- function(dat, col1, col2){
+  shuffled <- t(apply(dat[,c(col1, col2)], 1, function(i) sample(i, 2, replace = FALSE)))
+  colnames(shuffled) <- paste0(c(col1, col2), ".shuffled")
+  new.dat <- as.data.frame(cbind(dat, shuffled))
+  return(new.dat)
+}
+
+#Shuffle pairs and print new dataframe
+Movies_shuffle <- shuffle_pairs(Movies, 'TOBACCO_SEC', 'ALCOHOL_SEC')
+print(Movies_shuffle)
+
+#Confirmation that within each row magnitude of the differences has stayed the same as the original data
+abs(Movies_shuffle$TOBACCO_SEC - Movies_shuffle$ALCOHOL_SEC) == abs(Movies_shuffle$TOBACCO_SEC.shuffled - Movies_shuffle$ALCOHOL_SEC.shuffled)
+```
+
+2. Calculate the test statistic from a paired t test on this new data frame using the `t.test()$statistic` structure. 
+
+```{r}
+#Calculation of Test Statistics for a paired t test on 'Movies_shuffle' dataframe
+t.test(x= Movies_shuffle[Movies_shuffle$STUDIO == 'Disney', 'TOBACCO_SEC.shuffled'], y= Movies_shuffle[Movies_shuffle$STUDIO == 'Disney', 'ALCOHOL_SEC.shuffled'], paired=TRUE)$statistic
+```
+
+Repeat this process 10,000 times (without printing the data frames each time), storing the value of the test statistics in a vector. 
+
+```{r}
+
+#Randomization
+n.sims <- 10000
+t.stats <- rep(NA, n.sims)
+
+for (i in 1:n.sims){
+  Movies_shuffle <- shuffle_pairs(Movies, 'TOBACCO_SEC','ALCOHOL_SEC')
+  t.stats[i] <- t.test(x= Movies_shuffle[Movies_shuffle$STUDIO == 'Disney', 'TOBACCO_SEC.shuffled'], y= Movies_shuffle[Movies_shuffle$STUDIO == 'Disney', 'ALCOHOL_SEC.shuffled'], paired=TRUE)$statistic
+}
+```
+
+Plot the resulting vector of test statistics, highlighting the values that are "more extreme" than the test statistic you observed in Part A. 
+
+```{r}
+#Plot randomization results
+
+table(t.stats > abs(t$statistic) | t.stats < -1*abs(t$statistic)) %>%  prop.table()
+
+ggplot(data=as.data.frame(t.stats), aes(x=t.stats)) + 
+  geom_histogram(aes(fill=as.factor(t.stats > abs(t$statistic) | t.stats < -1*abs(t$statistic))), bins=50, colour='black') + 
+  scale_fill_discrete(name="Test Statistic", labels=c("Less extreme", "As or more extreme"))
+```
+
+Use these simulated results to estimate the p-value. (Hint: what proportion of the simulations yielded a test statistics as or more extreme than the one you observed in Part A?)
+
+```{r}
+cat('The proportion of simulations yielding a test statistic as or more extreme than',t$statistic,' from Part A is about 0.39.')
+
+```
+
+Compare this estimated p-value to the one you calculated in Part A.
+
+```{r}
+cat('This p-value is not exactly the same as that from Part A but is very close with an absolute difference of less than 0.05.')
+```
+
+When do you think that this type of randomization procedure might be preferred to the hypothesis testing procedure from Part A? Explain. 
+
+```{r}
+cat('When we know that we do not meet all of the requirements for a T test and thus at least one of the assumptions in a T test (or any hypothesis testing procedure) has not been fulfilled. For the t-test this could be that the distribution of data is not a normal curve, our sample size is not large enough, or there is no homogeneity in variance.
+    
+Furthermore, if we are not certain whether our variables are dependent or not as in our paired T-test, this randomization could be used.')
+```
+
+
+# Session Info
+```{r}
+sessionInfo()
+```

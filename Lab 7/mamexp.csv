@@ -1,0 +1,413 @@
+id,me,sympt,pb,famhist,bse,detc
+1,never,disagree,7,no,yes,somewhat likely
+2,never,agree,11,no,yes,very likely
+3,never,disagree,8,yes,yes,very likely
+4,<1 year,disagree,11,no,yes,very likely
+5,>1 year,stronly disagree,7,no,yes,very likely
+6,never,disagree,7,no,yes,very likely
+7,>1 year,stronly disagree,6,no,yes,somewhat likely
+8,never,stronly disagree,6,no,yes,very likely
+9,never,agree,6,no,yes,very likely
+10,<1 year,stronly disagree,6,no,yes,very likely
+11,never,stronly disagree,8,no,yes,somewhat likely
+12,never,disagree,6,yes,no,very likely
+13,never,stronly disagree,6,no,yes,very likely
+14,never,strongly agree,5,yes,yes,very likely
+15,never,agree,8,no,no,somewhat likely
+16,never,stronly disagree,11,no,yes,very likely
+17,never,disagree,6,no,yes,very likely
+18,<1 year,stronly disagree,5,no,yes,very likely
+19,never,disagree,10,no,yes,very likely
+20,never,disagree,10,no,yes,very likely
+21,>1 year,disagree,5,no,yes,very likely
+22,never,stronly disagree,5,no,yes,somewhat likely
+23,never,strongly agree,5,no,yes,very likely
+24,never,agree,8,no,yes,somewhat likely
+25,<1 year,agree,9,yes,yes,somewhat likely
+26,>1 year,stronly disagree,7,no,yes,very likely
+27,never,stronly disagree,7,no,yes,somewhat likely
+28,never,disagree,10,no,yes,very likely
+29,>1 year,disagree,7,no,yes,somewhat likely
+30,never,disagree,7,no,yes,very likely
+31,<1 year,stronly disagree,7,no,yes,somewhat likely
+32,>1 year,agree,5,no,yes,very likely
+33,>1 year,disagree,8,no,yes,very likely
+34,never,strongly agree,5,no,yes,very likely
+35,never,agree,9,no,yes,very likely
+36,>1 year,disagree,11,no,yes,very likely
+37,<1 year,disagree,7,no,yes,very likely
+38,>1 year,disagree,9,yes,yes,not likely
+39,never,disagree,5,yes,yes,very likely
+40,<1 year,disagree,5,yes,yes,very likely
+41,never,agree,10,no,no,not likely
+42,never,stronly disagree,5,no,yes,very likely
+43,never,disagree,9,no,yes,somewhat likely
+44,never,agree,8,no,yes,somewhat likely
+45,<1 year,disagree,9,no,yes,very likely
+46,never,disagree,5,no,yes,very likely
+47,never,disagree,9,no,yes,somewhat likely
+48,never,agree,9,no,no,not likely
+49,never,strongly agree,12,no,no,not likely
+50,never,stronly disagree,9,no,yes,somewhat likely
+51,>1 year,stronly disagree,5,no,yes,very likely
+52,never,agree,6,no,yes,somewhat likely
+53,<1 year,stronly disagree,8,no,yes,very likely
+54,never,stronly disagree,7,no,yes,very likely
+55,>1 year,disagree,9,no,yes,somewhat likely
+56,<1 year,stronly disagree,6,no,yes,somewhat likely
+57,<1 year,stronly disagree,6,yes,yes,somewhat likely
+58,never,disagree,10,no,yes,very likely
+59,never,agree,12,no,yes,somewhat likely
+60,never,stronly disagree,6,no,yes,very likely
+61,never,strongly agree,6,no,no,very likely
+62,never,disagree,10,no,yes,very likely
+63,never,agree,12,no,no,very likely
+64,>1 year,stronly disagree,6,no,yes,very likely
+65,never,agree,9,no,yes,very likely
+66,never,agree,9,no,yes,very likely
+67,never,disagree,9,no,no,somewhat likely
+68,never,stronly disagree,6,no,yes,not likely
+69,never,disagree,8,no,no,very likely
+70,never,disagree,6,no,yes,very likely
+71,<1 year,stronly disagree,5,yes,yes,very likely
+72,never,disagree,10,no,no,very likely
+73,never,stronly disagree,6,no,yes,very likely
+74,never,strongly agree,6,no,yes,somewhat likely
+75,<1 year,stronly disagree,5,no,yes,very likely
+76,<1 year,stronly disagree,5,no,yes,very likely
+77,never,agree,6,no,yes,somewhat likely
+78,<1 year,disagree,5,no,yes,somewhat likely
+79,never,agree,7,no,yes,very likely
+80,<1 year,strongly agree,6,no,no,somewhat likely
+81,>1 year,stronly disagree,7,no,yes,very likely
+82,<1 year,strongly agree,6,no,yes,very likely
+83,<1 year,stronly disagree,7,yes,no,very likely
+84,<1 year,stronly disagree,6,no,yes,very likely
+85,never,stronly disagree,5,no,yes,very likely
+86,<1 year,disagree,9,no,yes,very likely
+87,>1 year,agree,6,no,yes,very likely
+88,never,agree,11,no,no,very likely
+89,never,stronly disagree,9,no,no,very likely
+90,>1 year,strongly agree,9,no,no,not likely
+91,never,agree,7,no,no,somewhat likely
+92,never,disagree,10,no,yes,very likely
+93,<1 year,stronly disagree,8,no,yes,very likely
+94,<1 year,disagree,6,no,yes,very likely
+95,never,disagree,7,no,yes,very likely
+96,<1 year,disagree,8,yes,yes,very likely
+97,never,agree,10,no,yes,very likely
+98,never,disagree,7,yes,yes,very likely
+99,never,strongly agree,9,no,yes,very likely
+100,>1 year,stronly disagree,6,no,yes,very likely
+101,>1 year,stronly disagree,8,no,yes,very likely
+102,never,agree,8,no,yes,very likely
+103,never,stronly disagree,8,no,yes,very likely
+104,>1 year,stronly disagree,6,no,yes,very likely
+105,never,agree,10,no,yes,somewhat likely
+106,>1 year,stronly disagree,5,no,yes,very likely
+107,never,stronly disagree,5,no,yes,very likely
+108,never,disagree,5,yes,yes,very likely
+109,<1 year,disagree,7,no,yes,very likely
+110,never,disagree,10,no,yes,very likely
+111,<1 year,disagree,5,no,yes,very likely
+112,>1 year,disagree,8,no,yes,very likely
+113,never,disagree,5,no,yes,somewhat likely
+114,never,strongly agree,13,no,yes,not likely
+115,never,agree,6,no,yes,very likely
+116,>1 year,stronly disagree,5,no,no,somewhat likely
+117,<1 year,disagree,6,no,yes,very likely
+118,never,stronly disagree,9,no,yes,very likely
+119,never,strongly agree,5,no,yes,somewhat likely
+120,never,stronly disagree,6,no,no,very likely
+121,<1 year,stronly disagree,10,no,yes,very likely
+122,<1 year,stronly disagree,7,no,yes,very likely
+123,never,stronly disagree,7,no,no,very likely
+124,>1 year,disagree,7,no,yes,somewhat likely
+125,never,stronly disagree,5,no,yes,very likely
+126,never,strongly agree,5,no,yes,very likely
+127,>1 year,agree,7,yes,yes,very likely
+128,>1 year,disagree,11,no,yes,not likely
+129,<1 year,stronly disagree,6,no,yes,very likely
+130,never,strongly agree,8,no,yes,somewhat likely
+131,never,disagree,8,no,yes,very likely
+132,never,disagree,9,no,yes,very likely
+133,>1 year,disagree,9,yes,yes,somewhat likely
+134,<1 year,stronly disagree,5,no,yes,very likely
+135,never,agree,7,no,yes,very likely
+136,never,strongly agree,10,no,yes,somewhat likely
+137,<1 year,disagree,6,no,yes,very likely
+138,<1 year,disagree,10,no,yes,very likely
+139,<1 year,disagree,5,no,yes,very likely
+140,never,stronly disagree,8,no,no,somewhat likely
+141,never,strongly agree,9,no,yes,somewhat likely
+142,never,disagree,9,no,yes,not likely
+143,<1 year,stronly disagree,6,no,yes,very likely
+144,never,stronly disagree,11,no,no,very likely
+145,never,agree,9,no,no,not likely
+146,never,disagree,9,no,yes,somewhat likely
+147,never,stronly disagree,12,no,yes,somewhat likely
+148,never,strongly agree,11,no,yes,very likely
+149,<1 year,disagree,10,no,yes,very likely
+150,<1 year,disagree,9,no,yes,very likely
+151,never,agree,6,no,yes,very likely
+152,>1 year,disagree,5,no,yes,very likely
+153,<1 year,disagree,7,yes,yes,very likely
+154,<1 year,disagree,9,no,yes,very likely
+155,<1 year,stronly disagree,6,no,yes,very likely
+156,>1 year,disagree,8,yes,yes,very likely
+157,never,strongly agree,8,no,yes,very likely
+158,never,stronly disagree,5,no,yes,very likely
+159,never,disagree,8,no,yes,very likely
+160,never,stronly disagree,8,no,yes,somewhat likely
+161,>1 year,strongly agree,10,no,yes,somewhat likely
+162,<1 year,stronly disagree,9,no,yes,very likely
+163,never,stronly disagree,10,no,yes,very likely
+164,>1 year,stronly disagree,9,no,yes,very likely
+165,<1 year,stronly disagree,6,no,yes,very likely
+166,never,strongly agree,7,no,yes,somewhat likely
+167,never,disagree,5,no,no,very likely
+168,>1 year,disagree,5,no,yes,very likely
+169,>1 year,stronly disagree,9,no,yes,somewhat likely
+170,never,disagree,9,no,yes,very likely
+171,never,strongly agree,5,no,yes,very likely
+172,>1 year,strongly agree,5,no,yes,very likely
+173,never,stronly disagree,6,no,yes,very likely
+174,never,disagree,6,no,yes,very likely
+175,<1 year,stronly disagree,6,no,yes,very likely
+176,never,disagree,10,no,no,very likely
+177,never,stronly disagree,6,no,yes,very likely
+178,<1 year,disagree,5,yes,yes,somewhat likely
+179,never,agree,9,no,no,very likely
+180,<1 year,disagree,7,yes,yes,very likely
+181,never,disagree,10,no,no,very likely
+182,<1 year,disagree,8,no,yes,somewhat likely
+183,>1 year,agree,7,no,yes,somewhat likely
+184,never,agree,9,no,yes,very likely
+185,never,disagree,13,no,yes,somewhat likely
+186,never,stronly disagree,6,no,no,very likely
+187,never,disagree,8,no,yes,somewhat likely
+188,>1 year,disagree,10,no,no,very likely
+189,never,agree,10,no,yes,somewhat likely
+190,never,stronly disagree,11,no,yes,somewhat likely
+191,never,stronly disagree,7,no,yes,very likely
+192,>1 year,disagree,8,yes,yes,very likely
+193,>1 year,stronly disagree,10,no,no,very likely
+194,never,disagree,11,no,yes,very likely
+195,>1 year,disagree,9,yes,yes,somewhat likely
+196,<1 year,stronly disagree,5,yes,yes,very likely
+197,>1 year,disagree,7,no,yes,somewhat likely
+198,<1 year,stronly disagree,7,no,yes,very likely
+199,never,disagree,9,no,yes,very likely
+200,<1 year,disagree,5,no,yes,very likely
+201,never,agree,10,no,yes,somewhat likely
+202,<1 year,stronly disagree,5,no,yes,very likely
+203,<1 year,disagree,5,no,yes,very likely
+204,<1 year,disagree,9,no,yes,somewhat likely
+205,never,agree,7,no,no,somewhat likely
+206,never,strongly agree,10,no,yes,very likely
+207,<1 year,stronly disagree,5,yes,yes,very likely
+208,never,stronly disagree,6,no,yes,somewhat likely
+209,never,disagree,5,no,yes,very likely
+210,<1 year,disagree,7,no,yes,very likely
+211,<1 year,disagree,8,no,yes,somewhat likely
+212,never,agree,9,no,yes,very likely
+213,never,strongly agree,6,no,no,somewhat likely
+214,never,agree,13,yes,yes,very likely
+215,never,agree,9,yes,yes,very likely
+216,>1 year,stronly disagree,7,no,yes,very likely
+217,never,stronly disagree,5,no,no,very likely
+218,never,strongly agree,6,no,yes,somewhat likely
+219,never,disagree,8,no,yes,very likely
+220,<1 year,stronly disagree,7,no,yes,very likely
+221,never,disagree,6,no,yes,very likely
+222,never,disagree,5,no,yes,very likely
+223,<1 year,stronly disagree,5,no,yes,very likely
+224,never,disagree,6,no,yes,very likely
+225,never,stronly disagree,9,no,yes,somewhat likely
+226,<1 year,disagree,8,no,yes,very likely
+227,never,disagree,5,no,yes,very likely
+228,>1 year,agree,8,no,yes,very likely
+229,<1 year,stronly disagree,6,yes,yes,very likely
+230,>1 year,stronly disagree,6,no,yes,somewhat likely
+231,never,agree,8,no,yes,somewhat likely
+232,>1 year,strongly agree,10,no,yes,very likely
+233,never,agree,7,no,yes,somewhat likely
+234,<1 year,stronly disagree,5,no,no,very likely
+235,<1 year,disagree,6,yes,yes,very likely
+236,never,agree,11,no,yes,somewhat likely
+237,never,stronly disagree,5,no,yes,very likely
+238,never,stronly disagree,8,no,yes,very likely
+239,never,agree,7,no,yes,somewhat likely
+240,<1 year,agree,7,no,yes,very likely
+241,never,disagree,11,yes,no,not likely
+242,never,strongly agree,5,no,yes,very likely
+243,>1 year,stronly disagree,5,no,yes,very likely
+244,<1 year,stronly disagree,6,no,yes,very likely
+245,never,strongly agree,8,no,no,very likely
+246,<1 year,stronly disagree,5,no,no,very likely
+247,>1 year,disagree,6,yes,yes,very likely
+248,>1 year,stronly disagree,8,no,yes,very likely
+249,never,disagree,6,no,yes,very likely
+250,never,strongly agree,11,no,yes,not likely
+251,never,disagree,9,no,yes,very likely
+252,never,disagree,10,no,yes,very likely
+253,never,strongly agree,5,no,yes,somewhat likely
+254,<1 year,disagree,5,no,yes,very likely
+255,<1 year,stronly disagree,5,no,yes,very likely
+256,>1 year,stronly disagree,5,yes,yes,very likely
+257,never,stronly disagree,6,no,yes,very likely
+258,never,stronly disagree,7,no,yes,very likely
+259,<1 year,disagree,10,no,yes,very likely
+260,>1 year,disagree,10,no,no,not likely
+261,never,disagree,8,no,yes,very likely
+262,never,stronly disagree,6,no,yes,very likely
+263,>1 year,stronly disagree,6,no,yes,very likely
+264,never,disagree,10,no,yes,very likely
+265,never,stronly disagree,6,no,yes,very likely
+266,never,agree,11,no,no,somewhat likely
+267,never,disagree,9,no,yes,not likely
+268,never,disagree,8,no,yes,somewhat likely
+269,<1 year,agree,6,no,yes,very likely
+270,<1 year,disagree,9,no,yes,very likely
+271,<1 year,disagree,6,yes,yes,very likely
+272,never,agree,10,yes,yes,very likely
+273,never,disagree,7,no,yes,somewhat likely
+274,<1 year,disagree,6,no,yes,very likely
+275,>1 year,disagree,8,no,yes,very likely
+276,<1 year,stronly disagree,5,no,yes,very likely
+277,never,disagree,10,no,yes,very likely
+278,never,stronly disagree,8,no,yes,very likely
+279,never,agree,11,yes,yes,not likely
+280,never,stronly disagree,7,no,yes,very likely
+281,<1 year,disagree,9,no,yes,very likely
+282,<1 year,stronly disagree,7,yes,yes,very likely
+283,never,disagree,9,no,no,somewhat likely
+284,never,agree,9,yes,yes,somewhat likely
+285,never,disagree,6,no,yes,very likely
+286,never,agree,6,no,yes,somewhat likely
+287,<1 year,stronly disagree,5,yes,yes,very likely
+288,never,disagree,5,no,no,very likely
+289,never,stronly disagree,10,no,yes,very likely
+290,never,agree,9,no,yes,very likely
+291,never,disagree,6,no,yes,very likely
+292,never,disagree,7,no,yes,somewhat likely
+293,<1 year,agree,10,no,yes,not likely
+294,never,disagree,10,no,yes,very likely
+295,never,strongly agree,7,no,no,very likely
+296,>1 year,stronly disagree,7,no,yes,very likely
+297,never,stronly disagree,6,no,yes,very likely
+298,never,disagree,12,no,yes,very likely
+299,never,disagree,8,no,no,very likely
+300,never,agree,8,no,yes,somewhat likely
+301,never,stronly disagree,6,no,yes,somewhat likely
+302,never,disagree,10,no,no,very likely
+303,>1 year,disagree,5,no,yes,very likely
+304,never,agree,10,no,yes,somewhat likely
+305,<1 year,stronly disagree,8,no,no,very likely
+306,<1 year,stronly disagree,5,no,yes,very likely
+307,never,stronly disagree,11,no,yes,somewhat likely
+308,>1 year,agree,10,no,yes,very likely
+309,>1 year,disagree,5,no,yes,very likely
+310,>1 year,disagree,5,no,yes,very likely
+311,never,disagree,5,no,yes,very likely
+312,<1 year,stronly disagree,6,no,yes,very likely
+313,never,disagree,7,no,yes,somewhat likely
+314,never,disagree,7,no,yes,not likely
+315,never,agree,6,yes,no,somewhat likely
+316,<1 year,stronly disagree,5,no,yes,very likely
+317,>1 year,stronly disagree,5,no,yes,very likely
+318,<1 year,stronly disagree,7,yes,yes,somewhat likely
+319,never,disagree,10,no,yes,very likely
+320,<1 year,stronly disagree,8,no,yes,very likely
+321,<1 year,stronly disagree,8,yes,yes,very likely
+322,never,disagree,9,no,yes,very likely
+323,never,agree,11,no,no,not likely
+324,<1 year,stronly disagree,5,no,yes,very likely
+325,never,disagree,10,no,yes,very likely
+326,<1 year,stronly disagree,6,no,yes,very likely
+327,<1 year,stronly disagree,5,no,yes,very likely
+328,never,disagree,10,no,yes,somewhat likely
+329,<1 year,disagree,7,no,yes,very likely
+330,<1 year,stronly disagree,6,no,yes,very likely
+331,never,agree,10,no,yes,very likely
+332,never,agree,7,no,yes,very likely
+333,>1 year,stronly disagree,6,no,yes,somewhat likely
+334,>1 year,stronly disagree,8,no,yes,very likely
+335,>1 year,stronly disagree,5,yes,yes,very likely
+336,>1 year,disagree,10,yes,yes,very likely
+337,never,disagree,6,no,yes,very likely
+338,>1 year,stronly disagree,5,no,yes,somewhat likely
+339,never,strongly agree,9,no,yes,very likely
+340,never,stronly disagree,6,no,yes,somewhat likely
+341,<1 year,disagree,6,no,yes,very likely
+342,never,agree,10,no,no,somewhat likely
+343,never,disagree,5,no,yes,very likely
+344,never,disagree,9,no,no,very likely
+345,never,strongly agree,8,no,yes,somewhat likely
+346,never,disagree,9,no,yes,somewhat likely
+347,<1 year,stronly disagree,9,no,yes,very likely
+348,>1 year,disagree,10,no,yes,very likely
+349,never,stronly disagree,10,no,yes,very likely
+350,never,disagree,7,no,yes,very likely
+351,never,agree,6,no,yes,very likely
+352,<1 year,disagree,6,no,yes,very likely
+353,never,agree,12,no,yes,somewhat likely
+354,>1 year,strongly agree,7,no,yes,very likely
+355,never,stronly disagree,6,no,no,very likely
+356,never,strongly agree,9,no,yes,somewhat likely
+357,never,agree,8,yes,yes,very likely
+358,never,agree,10,no,yes,somewhat likely
+359,never,stronly disagree,5,no,yes,very likely
+360,<1 year,disagree,6,no,yes,very likely
+361,>1 year,disagree,5,no,yes,very likely
+362,never,agree,5,no,yes,very likely
+363,<1 year,stronly disagree,9,no,yes,very likely
+364,never,strongly agree,11,no,no,somewhat likely
+365,never,disagree,11,no,yes,very likely
+366,>1 year,stronly disagree,8,no,yes,very likely
+367,never,strongly agree,10,no,yes,very likely
+368,>1 year,stronly disagree,6,no,yes,very likely
+369,<1 year,stronly disagree,5,yes,yes,very likely
+370,never,stronly disagree,10,no,yes,very likely
+371,<1 year,stronly disagree,5,no,yes,very likely
+372,>1 year,stronly disagree,6,no,yes,very likely
+373,<1 year,stronly disagree,6,no,yes,very likely
+374,never,disagree,5,no,yes,very likely
+375,never,agree,11,no,yes,somewhat likely
+376,<1 year,disagree,10,no,yes,very likely
+377,<1 year,stronly disagree,9,no,yes,very likely
+378,>1 year,disagree,6,yes,yes,very likely
+379,never,disagree,9,no,yes,somewhat likely
+380,never,agree,9,no,yes,somewhat likely
+381,never,disagree,9,no,no,very likely
+382,>1 year,disagree,9,no,yes,very likely
+383,>1 year,disagree,10,no,yes,very likely
+384,never,disagree,9,no,yes,very likely
+385,>1 year,disagree,12,no,yes,somewhat likely
+386,never,strongly agree,11,no,yes,very likely
+387,never,strongly agree,5,no,yes,somewhat likely
+388,<1 year,stronly disagree,5,no,yes,very likely
+389,>1 year,stronly disagree,5,no,yes,very likely
+390,never,disagree,17,no,no,somewhat likely
+391,<1 year,disagree,6,no,yes,very likely
+392,never,agree,6,no,yes,very likely
+393,never,agree,10,no,yes,somewhat likely
+394,<1 year,disagree,5,no,yes,very likely
+395,never,disagree,5,no,yes,very likely
+396,never,strongly agree,5,no,yes,somewhat likely
+397,never,agree,10,no,no,somewhat likely
+398,never,stronly disagree,6,no,yes,somewhat likely
+399,>1 year,disagree,6,no,yes,somewhat likely
+400,never,agree,7,no,yes,somewhat likely
+401,never,agree,8,no,no,very likely
+402,<1 year,disagree,9,no,yes,very likely
+403,<1 year,stronly disagree,5,no,yes,very likely
+404,never,agree,12,no,yes,somewhat likely
+405,never,disagree,10,no,yes,somewhat likely
+406,>1 year,disagree,5,no,yes,very likely
+407,never,disagree,11,no,yes,somewhat likely
+408,<1 year,disagree,10,no,yes,somewhat likely
+409,never,stronly disagree,8,no,yes,very likely
+410,<1 year,stronly disagree,6,no,yes,very likely
+411,>1 year,agree,6,no,yes,very likely
+412,never,stronly disagree,7,no,yes,very likely

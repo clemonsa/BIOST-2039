@@ -1,0 +1,150 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 4"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: September 25, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(09252019) # Do not change this!
+library(ggplot2)
+```
+
+# Problem 1 
+
+A study compared different treatments for preventing bone loss among postmenopausal women younger than 60 years old. The mean change in bone-mineral density of the lumbar spine over a 2-year period for women in the **placebo** group was -1.8% (a mean decrease), with a standard deviation of 4.3%. Assume the change in bone-mineral density is normally distributed $X \sim N(-1.8, 4.3^2)$. The change in bone-mineral density of the lumbar spine over a 2-year period among women in the **treatment (alendronate 5-mg)** group was +3.5% (a mean increase), with a standard deviation of 4.2%. Assume this change in bone-mineral density is normally distributed $X \sim N(3.5, 4.2^2)$.  
+
+## Part A (4 points)
+If a decline of 2% in bone-mineral density is considered clinically significant, then what is the probability of a randomly selected woman in the placebo group showing a clinically significant decline? What is the probability of a randomly selected woman in the treatment group showing a clinically significant decline in bone-mineral density?
+
+```{r}
+psig<- pnorm(q=-0.02, mean=-0.018, sd=0.043)
+tsig<- pnorm(q=-0.02, mean=0.035, sd=0.042)
+
+#Create values storing clinically significant probabilities for placebo and treatment groups
+
+cat('The probabilities of a randomly selected woman in the placebo or treatment groups showing a 2% decline in bone-mineral density are',psig,'and',tsig,'respectively.' )
+```
+
+There is a 48.1% chance of a randomly selected woman from the placbo group showing a 2% decline in bone-mineral density. For a randomly selected woman in the treatment group, there is a 9.52% chance.
+
+## Part B (6 points)
+Create two vectors - one for the placebo group and the other for the treatment group - that simulate the change in bone-mineral density. Use this simulated changes to estimate the probabilities you calculated in part A. Then, create visualizations of these simulated effects (i.e. histograms or densities) that display your estimated probabilities as shaded areas. 
+```{r}
+psim <- rnorm(1000,-0.018, 0.043)
+tsim <- rnorm(1000,0.035, 0.042)
+#Create values storing simulations of 1000 normal distributions for the placebo and treatment groups
+
+psig2 <- sum(psim<= -0.02)/1000
+tsig2 <- sum(tsim<= -0.02)/1000
+#Create values storing clinically significant probabilities for placebo and treatment groups from simulations
+
+cat('The probabilities of a randomly selected woman in the placebo or treatment groups showing a 2% decline in bone-mineral density are',psig2,'and',tsig2,'respectively.' )
+
+ggplot(as.data.frame(psim), aes(x=psim)) + geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 20) + 
+    geom_density(alpha = 0.5, fill='#FF6666')
+
+ggplot(as.data.frame(tsim), aes(x=tsim)) + geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 20) + 
+    geom_density(alpha = 0.5, fill='royalblue4')
+
+
+
+```
+
+There is a 50.8% chance of a randomly selected woman from the placbo group showing a 2% decline in bone-mineral density. For a randomly selected woman in the treatment group, there is a 9.8% chance.
+
+These results are very similar to the theoretically calculated probabilities from part A.
+
+```{r}
+
+```
+
+# Problem 2 (5 points)
+
+Neuroblastoma (a rare form of cancer) occurs in 11 children in a million. In Oak Park, Illinois, which has a population of 12,429 children, there were 4 cases of neuroblastoma. 
+
+Assuming that the rate of neuroblastoma is theoretically the same for all cities, what is the expected number of neuroblastoma cases for 12,429 children?  Using that calculation and the Poisson distribution, find the probability of observing 4 or more cases of neuroblastoma. Does the cluster of 4 cases of neuroblastoma seem likely if the rate of neuroblastoma is correct?
+
+```{r}
+lambda <- 11/1000000 
+#rate of neuroblastoma in children
+expected <- 12429*lambda 
+#expected number of cases for 12,429 children
+
+cat('The expected number of neuroblastoma cases for 12,429 children is',expected,'.')
+
+p4m <- ppois(q=3, lambda=expected, lower.tail = FALSE)
+#Stores value of the probability of observing 4 or more cases of neuroblastoma amongst 12,429 children.
+
+cat('Using the Poisson distribution (P(X > 4)), the probability of observing 4 or more cases is',p4m*100,'%.')
+
+```
+
+Based on the national rate, the expected number of cases of neuroblastoma amongst 12,429 children is approximately 0, furthermore the Poisson distribution states that the probability is nearly 0 as well. 
+
+Thus, the cluster of 4 cases in Oak Park, IL seems very unlikely even when assuming the rate is correctly. There is a possibility that there is a factor contributing to the alarmingly high number of cases.
+
+# Problem 3 
+
+Composite sampling is a technique used sometimes in medical laboratories to save time and money by combining blood samples for test so that only one test is conducted for several people. (The combined sample tests positive if at least one person has the disease. If the combined sample tests positive, then individual tests are used to identify the individual(s) with the disease.
+
+It is estimated worldwide that 1\% of people aged 15-49 years old are infected with the human immunodeficiency virus (HIV), based on data from the NIH. A laboratory wants to use composite sampling to test for HIV but they don't know how many samples they should combine when doing composite testing. 
+
+## Part A (3 points)
+Use the binomial distribution to calculate the probability of the composite sample testing positive if the lab combines 10, 30, or 50 samples when doing composite testing.
+
+```{r}
+hiv10 <-pbinom(0,10,0.01, lower.tail = FALSE)
+hiv30 <-pbinom(0,30,0.01, lower.tail = FALSE)
+hiv50 <-pbinom(0,50,0.01, lower.tail = FALSE)
+#Stores values of probability of getting at least 1 positive test result from composite sampling when combining 10, 30, or 50 samples.
+
+cat('The probabilities of a composite sample testing positive, when combining 10, 30, or 50 samples is',c(hiv10, hiv30, hiv50),'respectively.')
+```
+
+Roughly 9.6% of composite tests will give a positive result when combining 10 samples, this increases to 26% and 39.5% for 30 and 50 samples respectively. 
+
+## Part B (10 points)
+Assume that the lab decides to combine 30 samples when doing composite testing. They want to know how many tests they will have to run on average using this method (i.e. what is the expected number of total tests performed). To estimate this number, run a simulation that randomly selects 30 individuals from the population (of which 1\% have HIV), uses the composite sampling techinique to test for HIV. For each simulation iteration, record the total number of tests performed. Create a visualization and numerical summary of the distribution of the total number of tests performed. Use this to estimate the average number of total tests performed. 
+
+```{r}
+hivsim <- rbinom(1000,30,0.01)
+#1000 random binomial simulations of getting a positive in each composite cluster test of 30 samples
+
+df <- data.frame(hivsim)
+#create dataframe of simulation test results
+
+df[df > 0] = 31
+df[df == 0] = 1
+#Converts iterations with 0 positives to the value '1' and iterations with at least 1 positive to '31' to represent each iteration having either 1 test or 31 test depending on a positive composite test result.
+
+tot_test <- sum(df)
+#Stores total number of tests from dataframe of simulation
+
+pos <- sum(df==31)
+
+summary(df)
+
+matrix <- as.matrix.data.frame(df)
+hist(matrix, ylab = 'Simulations', xlab='Tests', main = '1000 Simulations for Tests Required')
+
+cat('The total number of tests performed was', tot_test,'with',pos,'positive composite tests which required',pos*30,' additional tests and',1000-pos,'negative composite tests. There is an average number of',tot_test/1000,'tests performed in each composite sampling.')
+
+```
+
+# Session Info
+```{r}
+sessionInfo()
+```

@@ -1,0 +1,142 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 5"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: October 2, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(10022019) # Do not change this!
+library(tidyverse)
+library(ggplot2)
+```
+
+# Problem 1 
+
+Assume that the distribution of sleep duration for adults is normal with mean 6.8 hours and standard deviation of 1.4 hours. The recommended sleep duration for adults is between 7 and 9 hours each night. 
+
+## Part A (15 points)
+
+Estimate the probability that a randomly selected adult from this population gets between 7 and 9 hours of sleep through simulation. To do this, randomly sample 1000 individuals' sleep duration from the specified distribution and calculate what proportion of them fall within the desired boundaries. Create a histogram of your simulated sleep durations, highlighting those that fall within the desired boundaries.
+```{r}
+rndm1 <- rnorm(1000, 6.8, 1.4)
+#Stores random normal distribution with a mean of 6.8 and sd of 1.4
+
+prob1 <- sum(rndm1<=9)/1000 - sum(rndm1<7)/1000
+#Stores proportion of rndm1 with values between 7 and 9.
+
+p1 <- ggplot(as.data.frame(rndm1), aes(x=rndm1)) + 
+         geom_histogram(aes(fill=as.factor(7 <= rndm1 & rndm1 <= 9 )))
+#Create histogram highlighting proportion that is P(7 <= X <= 9)
+
+plot(p1)
+
+cat('Of 1000 randomly sampled individuals, the proportion of them that get between 7 and 9 hrs of sleep are',prob1)
+```
+Based on your simulation, what are plausible values for the sleep duration from a randomly selected individual?
+
+```{r}
+cat('Based on the above simulation, plausible values for the sleep duration of a randomly selected individual are between',range(rndm1),'hrs.')
+```
+
+Estimate the probability that the average sleep duration from a random sample of 5 adults from this population is between 7 and 9 hours through simulation. To do this, take 1000 random samples of 5 individuals' sleep duration from the specified distribution. For each sample store the mean sleep duration only. Use the stored 1000 means to calculate what proportion of them fall within the desired boundaries. Create a histogram of your simulated average sleep durations, highlighting those that fall within the desired boundaries.
+
+```{r}
+rndm2 <- rnorm(1000, 6.8, 1.4/sqrt(5))
+#Stores random normal distribution of mean sleep hours for 5 individuals with a mean of 6.8 and sd of 1.4
+
+prob2 <- sum(rndm2<=9)/1000 - sum(rndm2<7)/1000
+#Stores proportion of rndm2 with values between 7 and 9.
+
+p2 <- ggplot(as.data.frame(rndm2), aes(x=rndm2)) + 
+         geom_histogram(aes(fill=as.factor(7 <= rndm2 & rndm2 <= 9 )))
+#Create histogram highlighting proportion that is P(7 <= X <= 9)
+
+plot(p2)
+
+cat('Of 5 randomly sampled individuals, the mean proportion of them that get between 7 and 9 hrs of sleep are',prob2)
+```
+
+Based on your simulation, what are plausible values for the sample mean sleep duration from a random sample of 5 individuals?
+
+```{r}
+cat('Based on the above simulation, plausible values for the sleep duration of a randomly selected individual are between',range(rndm2),'hrs.')
+```
+
+Estimate the probability that the average sleep duration from a random sample of 50 adults from this population is between 7 and 9 hours through simulation. To do this, take 1000 random samples of 50 individuals' sleep duration from the specified distribution. For each sample store the mean sleep duration only. Use the stored 1000 means to calculate what proportion of them fall within the desired boundaries. Create a histogram of your simulated average sleep durations, highlighting those that fall within the desired boundaries. 
+
+```{r}
+rndm3 <- rnorm(1000, 6.8, 1.4/sqrt(50))
+#Stores random normal distribution of mean sleep hrs for 50 individuals with a mean of 6.8 and sd of 1.4
+
+prob3 <- sum(rndm3<=9)/1000 - sum(rndm3<7)/1000
+#Stores proportion of rndm3 with values between 7 and 9.
+
+p3 <- ggplot(as.data.frame(rndm3), aes(x=rndm3)) + 
+         geom_histogram(aes(fill=as.factor(7 <= rndm3 & rndm3 <= 9 )))
+#Create histogram highlighting proportion that is P(7 <= X <= 9)
+
+plot(p3)
+
+cat('Of 50 randomly sampled individuals, the mean proportion of them that get between 7 and 9 hrs of sleep are',prob3)
+```
+
+Based on your simulation, what are plausible values for the sample mean sleep duration from a random sample of 50 individuals?
+
+```{r}
+cat('Based on the above simulation, plausible values for the sleep duration of a randomly selected individual are between',range(rndm3),'hrs.')
+```
+
+## Part B (8 points)
+
+Calculate the probability that a randomly selected adult from this population gets between 7 and 9 hours of sleep using the normal probability distribution. How does this compare to your estimate from part A?
+
+```{r}
+pdf1 <- pnorm(9,6.8,1.4) - pnorm(7, 6.8, 1.4)
+#Stores normal probability distribution for a randomly selected adult getting between 7 and 9 hrs of sleep
+
+cat('The probability of a randomly selected adult from this population getting between 7 and 9 hours of sleep is',pdf1,'. In comparison to the estimate from part A which is',prob1,', this differs a slight bit by',abs(prob1 - pdf1),'.')
+```
+
+Calculate the probability that the average sleep duration from a random sample of 5 adults from this population is between 7 and 9 hours? How does this compare to your estimate from part A?
+
+```{r}
+pdf2 <- pnorm(9,6.8,1.4/sqrt(5)) - pnorm(7, 6.8, 1.4/sqrt(5))
+#Stores normal probability distribution for 5 randomly selected adults getting between 7 and 9 hrs of sleep
+
+cat('The probability of 5 randomly selected adults from this population getting between 7 and 9 hours of sleep is',pdf2,'. In comparison to the estimate from part A which is',prob2,', which is more similar than before, but still not exactly the same and differs by',abs(prob2 - pdf2),'.')
+```
+
+Calculate the probability that the average sleep duration from a random sample of 50 adults from this population is between 7 and 9 hours? How does this compare to your estimate from part A?
+
+```{r}
+pdf3 <- pnorm(9,6.8,1.4/sqrt(50)) - pnorm(7, 6.8, 1.4/sqrt(50))
+#Stores normal probability distribution for 50 randomly selected adults getting between 7 and 9 hrs of sleep
+
+cat('The probability of 50 randomly selected adults from this population getting between 7 and 9 hours of sleep is',pdf3,'. In comparison to the estimate from part A which is',prob3,', which is nearly exactly the same and differs by',abs(prob3-pdf3),'.')
+```
+
+Compare the 3 probabilities you calculated above. Explain why they differ. (Hint: think about the sampling distributions and standard error.) 
+
+```{r}
+cat('The probabilities I calculated decreased with each increase in sample size. They decreased because the precision of the mean improves as the sample gets larger. As more of the population is captured within the distribution the standard error decreases and the distribution of sample means approach a normal distribution.')
+```
+
+
+
+# Session Info
+```{r}
+sessionInfo()
+```

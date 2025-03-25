@@ -1,0 +1,152 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 12"
+author: "Arvon" # Change this to your name!
+date: "due: December 4, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(12042019) # Do not change this!
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+```
+
+# Problem 1 (10 points)
+
+```{r}
+cns <- read.csv("cns.csv", as=T)
+```
+
+A previous study reported an inverse relationship between the rate of congenital malformations of the central nervous system (CNS) and the average water hardness of local water supplies. Use the data set `cns.csv`, which contains the average rate of congenital CNS malformations (cns) and the average water hardness in ppm (water) for a random sample of 20 metropolitan areas.
+
+Research question: Is there a significant correlation between the average rate of congenital CNS malformations and the average water hardness?  
+
+Conduct appropriate statistical analyses to answer the researcher question using a 0.05 significance level. Be sure to include the following:  
+
+A. Appropriate numerical and visual descriptive statistics
+```{r}
+print(cns[1:5,])
+summary(cns)
+
+#qqplots to demonstrate whether variables are normally distributed
+
+plot1 <- ggqqplot(cns, x = 'water') + ggtitle('Distribution of Water')
+plot2 <- ggqqplot(cns, x='cns') + ggtitle('Distribution of CNS')
+
+#Scatterplot w/ Linear Regression line
+plot3 <- ggplot(cns, aes(x=cns, y=water)) + 
+  geom_point()+
+  geom_smooth(method=lm)
+
+ggarrange(plot1,plot2, plot3,
+          labels = c("A", "B", "C"),
+          ncol = 2, nrow = 2)
+
+```
+
+B. Descriptions of the hypothesis testing procedures used (the null and alternative hypotheses, checking conditions, reporting and interpreting the test statistic and p-value, reporting the statistical decision and conclusion in context of the research question)
+
+The CNS data variables (cns and water) are paired, continous and approximately normally distributed. This meets the conditons for a Pearson's correlation coefficient hypothesis test to determine whether these is significant correlation between water and CNS variables.
+
+Null: The true population correlation between CNS rate and Water Hardness are equal to 0.
+
+Alternative: The true population correlation between CNS rate and Water Hardness are NOT equal to 0.
+
+```{r}
+n <- nrow(cns) #number of samples in cns dataframe
+p <- with(cns, cor.test(water,cns)) #Pearsons Correlation Test
+q <- qt(p=0.025, df= n-2, lower.tail = FALSE) #Test Statistic
+
+print(c(n,p,q))
+```
+
+The Test Statistic `r p$statistic` is underneath the T-distribution with `r  n - 2` degrees of freedom. The absolute value of the Test Statistic is `r abs(p$statistic)` which is greater than the Critical Value/Rejection Region of `r q`. Assuming that the Null Hypothesis was true the probability of seeing a correlation greater or more than `r p$estimate` is equal to the p-value of `r p$p.value`. We are 95% confident that the true population correlation between CNS and Water Hardness are between `r p$conf.int[1:2]`. 
+
+The interpretations from Test Statistic and P-value suggests we have very strong evidence to REJECT THE NULL. As such our statistical decision is to REJECT THE NULL hypothesis and we conclude that the true population correlation between CNS rate and Water Hardness are NOT equal to 0.
+
+C. An interpretation of the results in the context of the research question  
+
+We conclude that there is a significant correlation between the average rate of congenital CNS malformations and the average water hardness
+
+# Problem 2 (10 points)
+
+```{r}
+homeprices <- read.csv("homeprices.csv", as=T)
+```
+
+Use the dataset `homeprices.csv` dataset which explores home price and neighborhood characteristics. This dataset comprises 104 homes in Northampton, MA that were sold in 2007. They recorded the bikescore, a measure from 0-100 indicating how bike friendly a neighborhood is (more information can be found here: https://www.walkscore.com/bike-score-methodology.shtml), and the Zillow.com estimate of each home’s price in 2007, 2011, and 2014. Additional attributes such as square footage, number of bedrooms and bathrooms were recorded from a realty database from 2007. Note: home prices are in thousands of dollars.  
+
+Research question: what is the effect of bikescore on home price in 2007?  
+
+Conduct an appropriate statistical analysis to answer the researchers question using a 0.05 significance level. Be sure to include the following:  
+
+A. Appropriate numerical and visual descriptive statistics
+```{r}
+print(homeprices[1:5,])
+summary(homeprices)
+
+#qqplots to demonstrate whether variables are normally distributed
+
+plot4 <- ggqqplot(homeprices, x = 'bikescore') + ggtitle('Distribution of Bike Score Index')
+plot5 <- ggqqplot(homeprices, x='price2007') + ggtitle('Distribution of Home Prices (2007) in thousands') + font('title', size=8, face='bold')
+
+#Scatterplot w/ Linear Regression line
+plot6 <- ggplot(homeprices, aes(x=bikescore, y=price2007)) + 
+  geom_point()+
+  geom_smooth(method=lm)
+
+#Histogram of Home Prices
+plot7 <- ggplot(data=homeprices, aes(x=price2007)) +
+geom_histogram(aes(y=..count..), colour = 'black', fill='royalblue4', bins = 30) + ggtitle('Home Prices (2007) in thousands') + xlab('Price')
+
+ggarrange(plot4,plot5, plot6,plot7,
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
+```
+
+B. Descriptions of the statistical analysis used (the null and alternative hypotheses, checking conditions, reporting and interpreting the test statistic and p-value, reporting the statistical decision and conclusion in context of the research question, interpretations of the important components of the statistical model, etc.)
+
+The values for the dependent variable 'price2007' are approximately normally distributed (i.e. symmetrical and unimodal) with some right skewness and outliers. There appears to be a linear relationship between the two variables 'bikescore' and 'price2007' thus meeting the conditons to run a linear regression hypothesis test for the effect of Bike Score on Home Price in 2007.
+
+Null: The change in the average of home prices in 2007 corresponding to a change in bike score by each unit is equal to 0.
+
+Alternative: The change in the average of home prices in 2007 corresponding to a change in bike score by each unit is NOT equal to 0.
+
+```{r}
+#Linear Regression Model w/ Beta1 Coefficient Hypothesis Test
+n2 <- nrow(homeprices) #number of samples
+l<- with(homeprices, lm(homeprices$bikescore~homeprices$price2007)) #linear regression model
+l2 <- summary(l) #summary of linear model
+l2
+
+fstat <- l2$fstatistic[1] #Test Statistic
+q2 <- qt(0.025, df=n2-2, lower.tail = FALSE) #Critical value/Rejection Region
+pval <- l2$coefficients[2,4] #P-value
+beta1 <- l2$coefficients[2,1] #Estimated effect of bikescore variable on price2007
+
+print(c(n2, fstat, q2, pval, beta1))
+```
+
+The Test Statistic `r fstat` is underneath the T-distribution with `r  n2 - 2` degrees of freedom. The absolute value of the Test Statistic is `r abs(fstat)` which is greater than the Critical Value/Rejection Region of `r q2`. Assuming that the Null Hypothesis was true the probability of seeing an effect on 'price2007' from 'bikescore' greater or more than `r beta1` is equal to the p-value of `r pval`. The interpretations from Test Statistic and P-value suggests we have very strong evidence to REJECT THE NULL. The correlation coefficient `r l2$r.squared` is positive but close to 0, which suggests a weak but positive correlation between Bike Walk Score and Home Prices in 2007. As such our statistical decision is to REJECT THE NULL hypothesis and we conclude that the change in the average of home prices in 2007 corresponding to a change in bike score by each unit is NOT equal to 0.
+
+C. An interpretation of the results in the context of the research question
+
+The effect of bikescore on home price in 2007 is that the average home price increases by `r beta1` for each point change in bike score, however Bike Score was not a very good predictor of home price in 2007.
+
+# Session Info
+```{r}
+sessionInfo()
+```

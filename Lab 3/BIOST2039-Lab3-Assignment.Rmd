@@ -1,0 +1,152 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 3"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: September 18, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(09182019) # Do not change this!
+```
+
+# Problem 1 
+
+Suppose that for a given population the probability of an unvaccinated individual contracting influenza during flu season is 0.20, the probability of an vaccinated individual contracting influenza during flu season is 0.05, and the probability of being vaccinated for influenza is 0.40. Consider 20 randomly selected individuals from this population. (We will assume that these 20 individuals are geographically separated enough that one of them contracting influenza does not influence the likelihood of another contracting influenza.)
+
+With the above information I will label the following probabilities:
+
+(i)Contracting Influenza if unvaccinated P(A|B) = 0.20
+(ii)Contracting Influenza if vaccinated P(A|B') = 0.05
+(iii) Being unvaccinated for influenza P(B) = 1-P(B') = 1-0.40 = 0.60
+(iv) P(A & B) = P(A|B)P(B) = 0.20*0.60 = 0.12
+
+Which allows me to create the following table:
+```{r}
+trial <- matrix(c(2.4,.4,2.8,9.6,7.6,17.2,12,8,20), ncol = 3)
+colnames(trial)<- c('Flu','No Flu','Total')
+rownames(trial)<- c('Unvaccinated','Vaccinated','Total')
+print(trial)
+prop.table(as.table(trial[-3,-3]))
+```
+Additional probabilities from the table:
+(v) P(A) = 0.14
+
+## Part A (5 points) 
+Using classical probability theory, find the probability that at least one of the 20 individuals contracts influenza.
+
+At least one individual contracts influenza is equal to the complement that no one contracts influenza. Which would be:
+```{r}
+print(1-(0.86^20))
+```
+Thus the probability is 0.951 or 95.1% that someone will contract influenza.
+
+## Part B (5 points) 
+Using the relative frequency approach, perform 1000 simulations to estimate the probability that at least one of the 20 individuals contracts influenza.
+```{r}
+flu <- rep('flu',2.8)
+noflu <- rep('no flu',17.2)
+health <- sample(x=c(flu,noflu),1000, replace=TRUE)
+prop.table(table(health))
+```
+Using the relative frequency apporach, the probability that an individual contracts the flu is 0.102
+
+As before, at least one individual contracting the flu is equal to the complement that no one contracts influenza
+```{r}
+print(1-(0.898^20))
+```
+Thus the probability is 0.884 or 88.4% that someone will contract influenza, slightly less than part (A).
+
+# Problem 2 
+
+Use the `Framiningham.Rdata` dataset to answer the following questions.
+```{r}
+library(tidyverse)
+load('Framingham.Rdata')
+data <- stata_data
+str(data)
+```
+
+## Part A (5 points) 
+Describe the distribution of cholesterol (`scl`) separately for those who developed coronary heart disease (`chdfate=1`) and those who did not develop coronary heart disease (`chdfate=0`). Include appropriate visualizations and numerical descriptions. Report the difference in mean cholesterol levels for the two groups.
+```{r}
+ 
+chd <- data[complete.cases(data$chdfate),]
+#Remove incomplete data from 'chdfate' column
+
+scl.complete <- chd[complete.cases(chd$scl),]
+#Remove incomplete data from 'scl' column
+
+ggplot(scl.complete, aes(x=scl)) + geom_histogram(aes(y=..density..), 
+       binwidth=15,
+      colour="black", fill="white") +
+    geom_density(alpha=.5, fill="#FF6666")  + facet_wrap(~ factor(chdfate))
+#Create Histogram overlayed with Density Plot
+
+chd0 <-scl.complete[scl.complete[,'chdfate']==0,]
+chd1 <-scl.complete[scl.complete[,'chdfate']==1,]
+#Stratifies scl.complete dataframe by chdfate variable into two different dataframes
+
+summary(chd0$scl)
+summary(chd1$scl)
+#summary descriptive statistics of each dataframe
+
+scl.means <- data.frame(mean(chd0$scl),mean(chd1$scl), stringsAsFactors = TRUE)
+colnames(scl.means) <- c('No Coronary','Coronary')
+row.names(scl.means) <- 'Mean'
+print(scl.means)
+#Create and print out dataframe showing the mean values of each Heart Attack status subset
+
+```
+Both group distrbutions appear to be right-skewed, with the mean cholesterol levels for those who didn't develop coronary heart disease being lower at 223 compared to the 239.8 cholesterol levels of the afflicted.
+
+## Part B (10 points) 
+Create a bootstrap distribution of the difference in mean cholesterol levels for the two groups. To do this, stratify the framingham dataset by `chdfate` so you have two data frames. For each of 1000 bootstrap samples, resample these two data frames separately, calculate the mean cholesterol for those who developed coronary heart disease and the mean cholesterol for those who did not develop coronary heart disease, calculate and record the difference in these means. Create a visualization of the bootstrap distribution of the difference in mean cholesterol levels for the two groups and describe the resulting distribution. Use the resulting distribution to estimate the probability that the *absolute* difference in mean cholesterol levels is greater than 40.
+```{r}
+n0 <- nrow(chd0)
+n1 <- nrow(chd1)
+#Records row number for chdx dataframes
+nboot <- 1000 # number of bootstrap samples
+
+boot0 <- data.frame(sim.num=1:nboot, means=rep(NA, nboot))
+boot1 <- data.frame(sim.num=1:nboot, means=rep(NA, nboot))
+# create a data frame to store results in 
+
+for(i in 1:nboot){
+  boot0.sample <- chd0[sample(x=1:n0, size=n0, replace=TRUE), ] # obtain the bootstrap sample
+boot0$means[i] <- mean(boot0.sample$scl) # record the 90th percentile of the bootstrap sample for boot0
+}
+
+for(i in 1:nboot){
+  boot1.sample <- chd1[sample(x=1:n1, size=n1, replace=TRUE), ] # obtain the bootstrap sample
+boot1$means[i] <- mean(boot1.sample$scl) # record the 90th percentile of the bootstrap sample for boot1
+}
+
+diff_means <- boot1$means - boot0$means #Record difference in means between bootstrap samplings
+
+ggplot(as.data.frame(diff_means), aes(x=diff_means)) + geom_histogram(aes(y=..density..), colour = 'black', fill='grey', bins = 20) + 
+geom_density(alpha = 0.5, fill='#FF6666') #histogram and density overlay for boot0
+
+table(abs(diff_means) > 40) %>% prop.table()
+
+```
+The distribution of the difference in means for cholesterol levels, between both scl groups, is largely symmetrical with a possible left skew. For most experiments the difference was 17.
+
+The probababilty is 0 for the difference in means, for cholesterol levels between both scl groups, to be greater than 40.
+
+
+# Session Info
+```{r}
+sessionInfo()
+```

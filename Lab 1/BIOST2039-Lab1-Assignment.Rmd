@@ -1,0 +1,305 @@
+---
+title: "BIOST 2039"
+author: "Arvon Clemons"
+date: 'due: September 4, 2019'
+output:
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+subtitle: Lab 1
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+Type your answer below each question. For questions that require the use of R, you can type both plain text (like this) and R commands by including an R chunk (see example below).  
+
+```{r}
+# This is an R chunk. Everything in this grey box is R code, not regular text.
+print("Hello, world!")
+```
+
+You can run R chunks individually by clicking the green arrow in the top right corner of an R chunk.  
+
+When typing plain text in an R Markdown, leave two spaces at the end of the line when you want a paragraph break.
+Otherwise, paragraphs are typset together, like this! For additional help with R Markdown, check out this reference sheet https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf.
+
+
+When you are finished, click `Knit` or `Knit to PDF` at the top of the Rmd editor. This will create an PDF file of that same name. Please submit the **PDF file** through Canvas.  
+
+```{r}
+set.seed(09042019) # Do not change this!
+```
+
+# Problem 1  (4 points)
+When asked to convert a vector, do not store it as a new vector unless asked to do so.  
+
+Consider the vector:  
+
+```{r}
+num <- c("1.5","2","8")
+```
+
+A. Convert `num` into a numeric vector using `as.numeric()`.
+```{r}
+num <- c("1.5","2","8")
+num <- as.numeric(num)
+print(num)
+```
+B. Convert `num` into a factor using `factor`. Store this in a new vector `num_fac`.
+```{r}
+num <- c("1.5","2","8")
+num_fac <- factor(num)
+print(num_fac)
+```
+C. Convert `num_fac` into a numeric using `as.numeric()`.
+```{r}
+num_fac <- as.numeric(num_fac)
+print(num_fac)
+```
+D. Convert `num_fac` into a numeric using `as.numeric(as.character())`.
+```{r}
+num_fac <- as.numeric(as.character(num_fac))
+print(num_fac)
+```
+
+# Problem 2  (4 points)
+When asked to convert a vector, do not store it as a new vector unless asked to do so.  
+
+Consider the vector:  
+
+```{r}
+num <- c(0, 1, 1, 0)
+```
+
+A. Append `TRUE` to the `num` vector using `c()`. Store the new vector as `num`.
+```{r}
+num <- c(num, 'TRUE')
+print(num)
+```
+B. Check the class of `num` using `class()`.  
+```{r}
+num <- c(0, 1, 1, 0)
+class(num)
+```
+C. Convert `num` into a logical vector using `as.logical()`.
+```{r}
+num <- c(0, 1, 1, 0)
+num <- as.logical(num)
+print(num)
+```
+D. Convert `num` into a logical vector where the result is `TRUE` if `num` is 0, using the `==` operator. 
+```{r}
+num <- c(0, 1, 1, 0)
+num <- num == 0
+print(num)
+```
+
+
+# Problem 3  (4 points)
+
+Consider the data set `data_bmi` which is contained in the `bmi_age.txt` file. Download the file from Canvas and store it in the same folder that you have this *.Rmd file stored.  
+```{r}
+file_name = "bmi_age.txt"
+data_bmi = read.table(file = file_name, header = TRUE, stringsAsFactors = FALSE)
+```
+
+Perform the following operations:  
+
+A. Extract the column nams of `data_bmi` using the `colnames()` function.
+```{r}
+cat('\014')
+colnames(data_bmi)
+```
+B. Extract the `AGE` column using the `[,]` operator.
+```{r}
+cat('\014')
+data_bmi[,'AGE']
+```
+C. Extract the `AGE` column using the `$` operator.
+```{r}
+cat('\014')
+data_bmi$AGE
+```
+D. Extract the `AGE` and `BMI` columns using brackets and the `c()` function.  
+```{r}
+cat('\014')
+data_bmi[,c('AGE','BMI')]
+```
+
+# Problem 4  (3 points)
+
+Here we will work with sequences and lengths: 
+
+A. Create a sequence from 1 to 4.5 by 0.24. Call this `run_num`.
+```{r}
+cat('\014')
+run_num <- seq(from = 1, to = 4.5, by = 0.24 )
+print(run_num)
+```
+B. Use the `length()` function to find the length of `run_num`?
+```{r}
+cat('\014')
+length(run_num)
+```
+C. Extract the fifth element of `run_num` using brackets.
+```{r}
+cat('\014')
+run_num[5]
+```
+
+# Problem 5  (6 points)
+
+Lets create a tibble called df:  
+```{r}
+df = dplyr::tibble(x = rnorm(10), y = rnorm(10), z = rnorm(10))
+```
+
+A. Extract the column `x` using the `$`.  
+```{r}
+cat('\014')
+df$x
+```
+B. Extract the column `x` using the `[,]` notation.  
+```{r}
+cat('\014')
+df['x']
+```
+C. Extract columns `x` and `z`.  
+```{r}
+cat('\014')
+df[c('x','z')]
+```
+D. Extract the third and fifth rows of `df` and columns `z` and `y`.  
+```{r}
+cat('\014')
+df[c(3,5),c('z','y')]
+```
+E. Get the mean of the column `x` using the `$` operator and `mean()`.  
+```{r}
+cat('\014')
+mean(df$x)
+```
+F. Pipe (`%>%`) the column `x` into the `mean()` function.  
+```{r}
+library(magrittr)
+cat('\014')
+df$x %>% mean()
+```
+
+
+# Problem 6  (10 points)
+
+Consider the data set data_bmi using the BMI data, but read in using `readr`:  
+```{r}
+file_name = "bmi_age.txt"
+data_bmi = readr::read_table2(file = file_name)
+data_bmi
+```
+
+A. What is the class of `data_bmi`?  
+```{r}
+cat('\014')
+class(data_bmi)
+```
+B. What is the class of `data_bmi[, "AGE"]`?  
+```{r}
+cat('\014')
+class(data_bmi[,'AGE'])
+```
+C. What is the class of `data_bmi$AGE`?
+```{r}
+cat('\014')
+class(data_bmi$AGE)
+```
+D. What is the mean of the `AGE` column?
+```{r}
+cat('\014')
+data_bmi$AGE %>% mean()
+```
+E. Set the 3rd element of `data_bmi$AGE` to be 42.   
+```{r}
+cat('\014')
+data_bmi$AGE[3]=42
+```
+F. What is the mean of the `AGE` column now?  
+```{r}
+cat('\014')
+data_bmi$AGE %>% mean()
+```
+G. Remove the `X5` column using `data_bmi$X5 = NULL`.  
+```{r}
+cat('\014')
+data_bmi$X5 = NULL
+data_bmi
+```
+H. Create `mat`, which is `data_bmi` as a `matrix`, using `as.matrix`.  
+```{r}
+cat('\014')
+mat <- data_bmi %>% as.matrix()
+mat
+```
+I. Try to extract `AGE` from mat using the `$`. What happened?  
+```{r error = TRUE}
+cat('\014')
+mat$AGE
+```
+J. Extract `AGE` from mat using the `[,]` notation.  
+```{r}
+cat('\014')
+mat[,'AGE']
+```
+
+# Problem 7  (5 points)
+
+Use the `roll2()` function that you created during the lab for this problem. You will need to re-define the function here by copying/pasting the code into the R chunk below. 
+
+```{r}
+# put your roll2() function here
+roll2 <- function(){
+  die <- seq(1:6)
+  dice <- sample(die, 2, replace = TRUE)
+  return(sum(dice))
+}
+```
+
+A. Create a numeric vector called `sim_num` which has the numbers 1 through 10. 
+```{r}
+cat('\014')
+sim_num <- c(1,2,3,4,5,6,7,8,9,10)
+print(sim_num)
+```
+B. Create a character vector called `roll` which has the results of 10 runs of the `roll2()` function.  
+```{r}
+cat('\014')
+roll <- as.character(sample(roll2(), size = 10, replace = TRUE))
+print(roll)
+```
+C. Create a data frame consisting of two columns using the two vectors you created above. Call this data frame `myrolls`.  
+```{r}
+cat('\014')
+myrolls <- data.frame(sim_num, roll)
+myrolls
+```
+D. Convert `myrolls` into a tibble.  
+```{r}
+library(dplyr)
+cat('\014')
+myrolls <- as.tbl(myrolls)
+myrolls
+```
+E. Using the data frame `myrolls` and the `table` function, create a table of the 10 roll results.
+```{r}
+cat('\014')
+table(myrolls)
+```
+
+# Session Info
+```{r}
+sessionInfo()
+```

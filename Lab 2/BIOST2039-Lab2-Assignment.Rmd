@@ -1,0 +1,226 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 2"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: September 11, 2019"
+output: 
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to PDF` at the top of the Rmd editor. This will create an PDF file of that same name. Please submit the **PDF file** through Canvas.  
+
+```{r}
+set.seed(09112019) # Do not change this!
+```
+
+# Problem 1 (8 points)
+
+Consider this observational study of 78 participants examining the efficacy of two drugs to treat migraines (DrugA and DrugB). Use the data called `migraine` to answer the following questions (available on Canvas).  
+
+Make sure that the .RData file is in the same folder as this file, or adjust the path to point to the file on your computer.  
+
+```{r}
+load("migraine.RData")
+str(migraine)
+```
+
+A. Create a two-way table of `sex` and `trt` and a bar chart displaying the frequency of treatment group stratified by sex. What proportion of participants receiving DrugA are male? What proportion of participants receiving DrugB are male? Based on this, do you think sex is likely to be a confounding factor in this study?
+
+```{r}
+table(migraine$sex, migraine$trt)
+```
+```{r}
+library(ggplot2)
+ggplot(data = migraine, aes(x = trt)) +
+  geom_bar(aes(fill=factor(trt))) + facet_wrap(~factor(sex))
+```
+
+17/29 participants receiving Drug A were male, 21/49 participants receiving drug B were male.
+
+Based on these results, I would agree that sex is a confounding factor due to the difference between groups for drug treatment being used.
+
+B. Create a two-way table of `severity` and `trt` and a bar chart displaying the frequency of migraine severity stratified by sex. What proportion of participants receiving DrugA have severe migraines? What proportion of participants receiving DrugB have severe migraines? Based on this, do you think migraine severity is likely to be a confounding factor in this study?
+
+```{r}
+table(migraine$severity, migraine$trt)
+ggplot(data = migraine, aes(x = severity)) +
+  geom_bar(aes(fill= factor(severity))) + facet_wrap(~factor(sex))
+```
+The proportion of participants receiving Drug A that have severe migraines are 8/29, the proportion of participants receiving Drug B that have severe migraines are 2/49.
+
+Severity being a confounding factor is likely possible, due to the differing rates of severity across the genders. However, it is worth nothing that the participants with severe migraines are similar across genders.
+
+C. If we were to conduct a different study with these participants, we could randomly assign the treatment to either DrugA or DrugB, rather than observing which drug participants were taking. Create a new column of `migraine` called `new.trt`. Use the `sample()` function to randomly generate a new set of treatment assignments and store them in the new column you just created. 
+
+```{r}
+migraine$new.trt <- sample(migraine$trt)
+```
+
+
+D. Recreate the two-way tables and bar charts that you made above using `new.trt` instead of `trt`. How have things changed? Explain.
+
+```{r}
+table(migraine$sex, migraine$new.trt)
+ggplot(data = migraine, aes(x = new.trt)) +
+  geom_bar(aes(fill=factor(new.trt))) + facet_wrap(~factor(sex))
+table(migraine$severity, migraine$new.trt)
+ggplot(data = migraine, aes(x = severity)) +
+  geom_bar(aes(fill= factor(severity))) + facet_wrap(~factor(sex))
+```
+
+The first table did change abit, we get a more even proportion of Males:Females taking both Drug A and Drug B. The bar graph also has changed and sex no longer appears as a confounding factor.
+
+However for the second table, the ratio of severe migraines with Drug A is 3/29 and the ratio for Drug B is 7/49. This is a change, with a lower ratio for Drug A and now a higher ratio for Drug B. The second bar graph is the same, but that is because the information for it didn't use the 'new.trt' variable whatsoever. 
+
+# Problem 2 (16 points)
+
+Use the `profiles` dataset to answer the following questions. To use this dataset you will need to run `install.packages("okcupiddata")` in R before running the R chunk below. These data come from 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile.  
+
+```{r}
+library(okcupiddata)
+data("profiles")
+str(profiles)
+```
+
+For information about this data set, including definitions of the columns, see: https://cran.r-project.org/web/packages/okcupiddata/okcupiddata.pdf 
+
+
+A. Create a frequency table and bar chart for the variable `status`. Describe its distribution. Include an investigation into any missing or unusual observations.  
+```{r}
+table(profiles$status)
+```
+```{r}
+ggplot(data = profiles, aes(x = status)) +
+  geom_bar(aes(fill=factor(status)))
+```
+A vast majority of profiles have their status as 'single', with 'seeing someone' being in second at 2064 and 'available' in third at 1865, 'married' in fourth at 310 and 'unknown' last at 10.
+
+There are 10 profiles with the status of 'unknown'
+
+B. Create a frequency table and bar chart for the variable `sex`. Describe its distribution. Include an investigation into any missing or unusual observations.
+```{r}
+table(profiles$sex)
+```
+```{r}
+ggplot(data = profiles, aes(x = sex)) +
+  geom_bar(aes(fill=factor(sex)))
+```
+The proportion of profiles who 'sex' are male is 35829/59946
+
+```{r}
+profiles[profiles$sex == 'unknown',]
+```
+There are no profiles that are missing their 'sex'.
+
+C. Create a frequency table and bar chart for the variable `status` stratified by `sex`. Describe its distribution. Include an investigation into any missing or unusual observations.    
+
+```{r}
+table(profiles$status, profiles$sex)
+```
+```{r}
+ggplot(data = profiles, aes(x = status)) + 
+  geom_bar(aes(fill=factor(status))) + facet_wrap(~factor(sex))
+```
+Between sexes, most profiles have a 'status' of single, with more males than females. More males than females are 'available', similar rates between both sexes of 'seeing someone' or 'married' or 'unknown'
+
+D. Provide a numerical summary, a histogram or density curve, and a boxplot for the variable `age`. Describe its distribution. Include an investigation into any missing or unusual observations.    
+
+```{r}
+summary(profiles$age)
+```
+```{r}
+ggplot(profiles, aes(x=age)) + 
+    geom_histogram(aes(y=..density..),      # Histogram with density instead of count on y-axis
+                   binwidth=3,
+                   colour="black", fill="white") +
+    geom_density(alpha=.2, fill="#FF6666") # Overlay with transparent density plot
+```
+```{r}
+ggplot(profiles, aes(y=age)) + geom_boxplot()
+```
+Most profiles are around the age of 30, which has the largest weight and is the median age. What is unusual is that the maximum age is 110 years old! The age distrution is heavily skewed right.
+
+E. Provide a numerical summary, a histogram or density curve, and a boxplot for the variable `age` stratified or colored by `sex`. Describe its distribution. Include an investigation into any missing or unusual observations.  
+```{r}
+do.call(rbind , by(profiles$age, profiles$sex, summary))
+```
+Between males and females, the distrubtion of age is very similar.
+
+```{r}
+ggplot(profiles, aes(x=age)) + 
+    geom_histogram(aes(y=..density..),      # Histogram with density instead of count on y-axis
+                   binwidth=3,
+                   colour="black", fill="white") +
+    geom_density(alpha=.2, fill="#FF6666") +
+  facet_wrap(~factor(sex))# Overlay with transparent density plot
+```
+Between males and females, the distrubtion of age is very similar.
+
+```{r}
+ggplot(profiles, aes(y=age)) + geom_boxplot() +facet_wrap(~factor(sex))
+```
+
+Between males and females, the distrubtion of age is very similar.
+
+F. Provide a numerical summary, a histogram or density curve, and a boxplot for the variable `height`. Describe its distribution. Include an investigation into any missing or unusual observations.    
+```{r}
+summary(profiles$height)
+```
+There are 3 profiles which didn't provide their height, the median height is 68.0 inches and the average is 68.3. The shortest height is 1.0 and the tallet is 95.0!
+
+```{r}
+ggplot(profiles[complete.cases(profiles),], aes(x=height)) + 
+    geom_histogram(aes(y=..density..),      # Histogram with density instead of count on y-axis
+                   binwidth=3,
+                   colour="black", fill="white") +
+    geom_density(alpha=.2, fill="#FF6666") # Overlay with transparent density plot
+```
+The height distribution largely follows a normal curve.
+
+```{r}
+ggplot(profiles[complete.cases(profiles),], aes(y=height)) + geom_boxplot()
+```
+There are a lot of outliers when it comes to height distrubtion, but largely the information is the same from the density/histogram plot.With a median height/average height of ~68 inches
+
+G. Provide a numerical summary, a histogram or density curve, and a boxplot for the variable `height` stratified or colored by `sex`. Describe its distribution. Include an investigation into any missing or unusual observations. 
+```{r}
+do.call(rbind , by(profiles$height, profiles$sex, summary))
+```
+
+The median height of males is 70 vs 65 for females, the averages are similar. The shortest male height is 1 while the shortest female is 4, the tallest height is 95 for both male and females. More males opted out of mentioning their height than females at a 2:1 ratio.
+
+```{r}
+ggplot(profiles[complete.cases(profiles),], aes(x=height)) + 
+    geom_histogram(aes(y=..density..),      # Histogram with density instead of count on y-axis
+                   binwidth=3,
+                   colour="black", fill="white") +
+    geom_density(alpha=.2, fill="#FF6666") +
+  facet_wrap(~factor(sex))# Overlay with transparent density plot
+```
+
+Within both sexes, height varies by the normal distrubtion. Females tend to range a little shorter than males, with more density at the lower heights. 
+
+```{r}
+ggplot(profiles[complete.cases(profiles),], aes(y=height)) + geom_boxplot() +facet_wrap(~factor(sex))
+```
+Much like the data provided in the first two visualizations, the average and median height of females are shorter than males. THere are more outliers amongst males than females.
+
+
+H. Create a scatterplot for the variables `height` and `age` stratified or colored by `sex`. Comment on the relationship between height and age for males and females. 
+```{r}
+ggplot(profiles[complete.cases(profiles),], aes(x=height, y=age)) + geom_point(aes(color=factor(sex)))
+```
+While women trend to be shorter than men, women tend to have have less of a range in height than men. Men heights and age cluster around 67-75 inches and 20 - 45 years. Women heights and ages cluster around 62 - 67 inches and 20 - 42 years.
+
+# Session Info
+```{r}
+sessionInfo()
+```

@@ -1,0 +1,233 @@
+---
+title: "BIOST 2039"
+subtitle: "Lab 11"
+author: "Arvon Clemons" # Change this to your name!
+date: "due: November 22, 2019"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+Please **change the author** of this file to your name instead of mine in the header above.  
+
+When you are finished, click `Knit` or `Knit to HTML` at the top of the Rmd editor. This will create an HTML file of that same name. Please submit the **HTML file** through Canvas. If Canvas gives you problems submitting the HTML file, you can knit to another file type.  
+
+```{r}
+set.seed(11222019) # Do not change this!
+library(ggpubr)
+library(dplyr)
+library(car)
+library(lsmeans)
+```
+
+# Problem 1 (10 points)
+Why is it called analysis of variance if we are comparing means? To address this question, consider two samples, contained in `dfA` and `dfB` below. 
+
+```{r}
+dfA <- data.frame(Sample1 = c(7,3,6,6), Sample2 = c(6,5,5,8), Sample3 = c(4,7,6,7))
+dfB <- data.frame(Sample1 = c(17,13,16,16), Sample2 = c(6,5,5,8), Sample3 = c(4,7,6,7))
+
+dfA
+dfB
+```
+
+A. How are the two data sets different? 
+
+The values in Column 'Sample 1' in dfB is exactly +10 greater than in dfA
+
+B. Calculate the means of the three samples for the two data sets and compare them.
+
+```{r}
+a1_mean <- mean(dfA$Sample1)
+a2_mean <- mean(dfA$Sample2)
+a3_mean <- mean(dfA$Sample3)
+b1_mean <- mean(dfB$Sample1)
+b2_mean <- mean(dfB$Sample2)
+b3_mean <- mean(dfB$Sample3)
+```
+
+The means for samples 1 - 3 for dfA are `r c(a1_mean,a2_mean,a3_mean)` respectively and for dfB are `r c(b1_mean,b2_mean,b3_mean)` respectively. The sample 1 mean for dfB is exactly +10 greater than in dfA.
+
+C. Calculate the between-sample variances for the two data sets.
+
+```{r}
+k <- ncol(dfA) #Number of Samples (k groups)
+print(k)
+
+#dfA and dfB means
+dfA_mean <- mean(as.matrix(dfA))
+dfB_mean <- mean(as.matrix(dfB))
+dfA_mean
+dfB_mean
+
+#Variances of Samples 1-3 means for dfA and dfB
+a1_var <- 4*(a1_mean - dfA_mean)^2
+a2_var <- 4*(a2_mean - dfA_mean)^2
+a3_var <- 4*(a3_mean - dfA_mean)^2
+
+b1_var <- 4*(b1_mean - dfB_mean)^2
+b2_var <- 4*(b2_mean - dfB_mean)^2
+b3_var <- 4*(b3_mean - dfB_mean)^2
+
+print(c(a1_var, a2_var, a3_var, b1_var, b2_var, b3_var))
+
+#Between-Sample Sum of Squares for dfA and dfB
+a_bss <- sum(c(a1_var,a2_var,a3_var))
+b_bss <- sum(c(b1_var,b2_var,b3_var))
+
+print(c(a_bss, b_bss))
+
+#Between Mean Squares
+a_msb <- a_bss/(k-1)
+b_msb <- b_bss/(k-1)
+print(c(a_msb,b_msb))
+```
+
+D. Calculate the within-sample variances for the two data sets.
+
+```{r}
+N <- prod(dim(dfA)) #Total Sample Size (N) 
+print(N)
+
+#Matrix of Mean of the Variances for dfA and dfB
+a_wss.matrix <- matrix(nrow=4,ncol=3)
+for (i in 1:3){
+  for (j in 1:4) {
+    a_wss.matrix[j,i]  <- (dfA[j,i] - mean(dfA[,i]))^2
+  }
+}
+
+b_wss.matrix <- matrix(nrow=4,ncol=3)
+for (i in 1:3){
+  for (j in 1:4) {
+    b_wss.matrix[j,i]  <- (dfB[j,i] - mean(dfB[,i]))^2
+  }
+}
+
+a_wss.df <- as.data.frame(a_wss.matrix)
+colnames(a_wss.df) <- c('Sample1','Sample2','Sample3')
+b_wss.df <- as.data.frame(a_wss.matrix)
+colnames(b_wss.df) <- c('Sample1','Sample2','Sample3')
+
+a_wss.df
+b_wss.df
+
+#Within-Sample Sum of Squares
+a_wss <- sum(a_wss.matrix)
+b_wss <- sum(b_wss.matrix)
+
+print(c(a_wss,b_wss))
+
+#Within Mean Squares
+a_msw <- a_wss/(N-k)
+b_msw <- b_wss/(N-k)
+
+print(c(a_msw,b_msw))
+```
+
+E. Calculate the F test statistic and corresponding p-value for the two data sets, 
+
+```{r}
+#F-statistics for dfA and dfB
+fsA <- a_msb/a_msw
+fsB <- b_msb/b_msw
+
+print(c(fsA,fsB))
+
+#p-values for dfA and dfB
+pvalA <- pf(q=fsA, df1 = k - 1, df2 = N - k, lower.tail=FALSE)
+pvalB <- pf(q=fsB, df1 = k - 1, df2 = N - k, lower.tail = FALSE)
+
+print(c(pvalA, pvalB))
+```
+
+F. Using these results, what can you conclude about the F test statistic?
+
+Using the above results, I can conclude that for dfA the F test statistic (`r fsA`) is NOT greater than the Critical Value/Rejection region.
+
+For dfB the F test statistic (`r fsB`) IS greater than the Critical Value/Rejection region. 
+
+Thus the variability between groups in dfA are NOT different while the variability between groups in dfB are different for AT LEAST one of the groups.
+
+
+# Problem 2 (20 points)
+A company interested in decreasing assembly time studied five different techniques for assembling a part. Workers were randomly assigned a technique to use to assemble the part and the time (in seconds) it took each worker to assemble it was recorded. 
+
+```{r}
+times <- read.csv("assemblytimes.csv")
+str(times)
+summary(times)
+```
+
+A. Write the effects model and the null and alternative hypotheses we would use to analyze the mean assembly time for the 5 techniques. Be sure to define the parameters you use in the context of the problem.
+
+The effects model will be:
+
+Yij = Mu + Tau(i) + Episilon(ij) where i= 1, 2, 3, 4, 5 and j = 1 to 28 in the set of natural numbers
+
+Null Hypothesis: The mean outcome times for each of the technique groups are equal to the true population mean and thus there is global equality.
+
+Alternative Hypothesis: The mean outcome times for each of the technique groups are NOT equal to the true population mean and at least one technique group mean is different.
+
+
+B. Are the assumptions for performing a one-way ANOVA met? Justify.
+
+The conditions for a one-way ANOVA are that an experiment be carried out in random order such that conditions for a treatment is being applied as uniform as possible. Also the experiment is meant to compare the levels of a single factor.
+
+Furthermore, there is an assumption that the outcome variable must be normally distributed.
+
+In this experiment, the techniques that were assigned to each worker were random and the factor being compared are the time (in seconds) till completion of a part.
+
+Regarding whether the outcome (time) is normally distributed:
+```{r}
+ggqqplot(times$Time)
+shapiro.test(times$Time)
+```
+
+Thus the assumptions for performing a one-way ANOVA were met.
+
+C. Regardless of your answer to B, perform a one-way ANOVA. Include the value of the test statistic, its distribution under the null hypothesis, the p-value, your decision.
+
+```{r}
+assembly.aovmodel <- aov(Time~Technique, data=times)
+summary(assembly.aovmodel)
+```
+
+The F-Statistic from the ANOVA analysis is 56.99 and is within the F distribution under the null hypothesis. The p-value was 5.15x10^-8, which suggests we have very strong evidence to REJECT the Null Hypothesis.
+
+As such, we decided that the mean outcome times for each of the technique groups are NOT equal to the true population mean and at least one technique group mean is different.
+
+D. Which technique is best? Perform an appropriate follow-up to C to answer this question, using an overall type 1 error rate of 0.05. 
+
+```{r}
+#Post-Hoc Analysis
+times$Technique.2 <- factor(times$Technique, levels = c('0','1','2','3','4','5')) #Create factors (0-5) for Techniques.2 column
+
+assembly.lmmodel <- lm(Time~Technique.2, data=times)
+Anova(assembly.lmmodel, type='II')
+
+par(mfrow = c(1,2))
+plot(assembly.lmmodel, which=c(1,2))
+
+leastsq <- lsmeans(assembly.lmmodel, pairwise~Technique.2, adjust='bonferroni')
+print(leastsq)
+```
+
+Based on the above results, the best technique is Technique 1 with an estimated outcome of 46.0 seconds (42.4, 49.6) 95% CI.
+
+E. If now you learn that this experiment initially included 40 workers who were randomly assigned to a technique (8 workers assigned to each technique), but some workers did NOT complete the task, how do you think that affects your conclusions? Specifically address how you think the mean time to completion for each technique might change and how that could impact your results.
+
+This could possibly skew the results and lead to bias, causing our conclusion to not reflect the truth. For example, the mean time to completion may actually be equal between all of the techniques but because results were omitted our analysis lead to the conclusion that at least one of the techniques had a different mean completion time. Which lead to our post-hoc analysis which determined that technique 1 had the least completion time.
+
+Instead of using the Bonferroni method for bounding the Type I error in making our comparisons, we would have best used the Tukey method. If there were truly a difference in between the TRUE completion mean time between the techniques, the Tukey method may have identified a technnique other than #1 as the best.
+
+
+# Session Info
+```{r}
+sessionInfo()
+```
