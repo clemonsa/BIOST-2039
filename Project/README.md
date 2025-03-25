@@ -9,7 +9,7 @@ Using the 2015-2016 NHANES survey to address the following two research question
 
 ## Abstract
 
-Sexually transmitted infections (STI) are highly prevalent in the United States<sup>2,3,</sub> with rates continuing to rise over the past decade after a historic low. Most STIs remain treatable, however the reasons for the resurgence of new cases is of notable concern.
+Sexually transmitted infections (STI) are highly prevalent in the United States <sup>2,3,</sub> with rates continuing to rise over the past decade after a historic low. Most STIs remain treatable, however the reasons for the resurgence of new cases is of notable concern.
 Several risk-factors such as intravenous drug use, reluctancy to use condoms, race/ethnicity, and lack of access to healthcare are known. Because of the social stigma, research into STI incidence is very difficult and there are perceptions into who in the population are at risk for affliction. We conducted a statistical analysis to examine whether U.S. citizens who may be perceived as ‘healthy’ are less likely to be STI positive in comparison to those who are perceived as ‘unhealthy’ using conventional ideas of healthy behavior which consisted of diet and exercise.
 We found that for woman in which a typical week included vigorous physical activity, there was a significant lower average of STI positive cases in comparison to those who in which a typical week had no physical activity.
 These results indicate a possible topic of exploration for identifying protective behavior against sexually transmitted diseases amongst physically active women.
